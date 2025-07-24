@@ -1,0 +1,96 @@
+.App {
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.App-header {
+  background-color: var(--secondary-color);
+  padding: 2rem 1rem;
+  color: white;
+}
+
+.App-header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.hero-section {
+  flex: 1;
+  padding: 4rem 0;
+}
+
+.hero-section h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: var(--secondary-color);
+}
+
+.form-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin: 3rem auto;
+  max-width: 600px;
+}
+
+.form-container h3 {
+  color: var(--primary-color);
+  margin-top: 0;
+}
+
+.telegram-cta {
+  margin: 3rem auto;
+  max-width: 600px;
+}
+
+.telegram-button {
+  background-color: #229ED9;
+  border: none;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.telegram-button:hover {
+  background-color: #1c84b4;
+}
+
+.coming-soon {
+  color: var(--text-light-color);
+  font-style: italic;
+}
+
+footer {
+  background-color: var(--secondary-color);
+  color: white;
+  padding: 1.5rem 0;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .App-header h1 {
+    font-size: 2rem;
+  }
+  
+  .hero-section h2 {
+    font-size: 1.5rem;
+  }
+  
+  .form-container, .telegram-cta {
+    margin: 2rem auto;
+    padding: 1.5rem;
+  }
+} 

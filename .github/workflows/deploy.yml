@@ -1,0 +1,48 @@
+name: Deploy Landing Page
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'landing/**'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: landing/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd landing
+        npm ci
+
+    - name: Build
+      run: |
+        cd landing
+        npm run build
+
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+        if_key_exists: replace
+
+    - name: Deploy to Yandex Cloud VM
+      run: |
+        rsync -avz --delete landing/build/ ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/
+      
+    - name: Restart Nginx (if needed)
+      run: |
+        ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} 'sudo systemctl reload nginx' 
