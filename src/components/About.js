@@ -19,17 +19,31 @@ const FeaturesGrid = styled.div`
 
 const FeatureCard = styled.div`
   background: linear-gradient(to right bottom, #1F2553, #13183D, #13183D, #1F2553);
-  border: 1px solid;
-  border-image: linear-gradient(to bottom right, #837BD0, #4E4988, #19163F, #19163F, #4E4988, #837BD0) 1;
+  position: relative;
   border-radius: 20px;
   padding: 38px 26px;
   height: 100%;
-  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
   text-align: center;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(to bottom right, #837BD0, #4E4988, #19163F, #19163F, #4E4988, #837BD0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
 `;
 
 const FeatureIcon = styled.div`
@@ -39,13 +53,28 @@ const FeatureIcon = styled.div`
   width: 60px;
   height: 60px;
   background: linear-gradient(to right bottom, #1F2553, #13183D, #13183D, #1F2553);
-  border: 1px solid;
-  border-image: linear-gradient(to bottom right, #837BD0, #4E4988, #19163F, #19163F, #4E4988, #837BD0) 1;
+  position: relative;
   border-radius: 60px;
   backdrop-filter: blur(17px);
   display: flex;
   justify-content: center;
   align-items: center;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 60px;
+    padding: 1px;
+    background: linear-gradient(to bottom right, #837BD0, #4E4988, #19163F, #19163F, #4E4988, #837BD0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
   
   &::after {
     content: '';

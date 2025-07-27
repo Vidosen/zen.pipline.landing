@@ -29,18 +29,41 @@ const FormInputs = styled.div`
   margin-bottom: 30px;
 `;
 
-const Input = styled.input`
+const InputWrapper = styled.div`
+  position: relative;
   width: 100%;
   height: 70px;
+  border-radius: 100px;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 100px;
+    padding: 1px;
+    background: linear-gradient(to bottom right, #837BD0, #4E4988, #19163F, #19163F, #4E4988, #837BD0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+`;
+
+const Input = styled.input`
+  width: 100%;
+  height: 100%;
   background-color: #191034;
-  border: 1px solid;
-  border-image: linear-gradient(to bottom right, #837BD0, #4E4988, #19163F, #19163F, #4E4988, #837BD0) 1;
+  border: none;
   border-radius: 100px;
   padding: 20px 30px;
   font-family: 'Gilroy', sans-serif;
   font-weight: 300;
   font-size: 17px;
   color: #F6F5FF;
+  position: relative;
+  z-index: 1;
   
   &::placeholder {
     color: #E8E6E6;
@@ -52,12 +75,33 @@ const Input = styled.input`
   }
 `;
 
-const TextArea = styled.textarea`
+const TextAreaWrapper = styled.div`
+  position: relative;
   width: 100%;
   height: 200px;
+  border-radius: 20px;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(to bottom right, #837BD0, #4E4988, #19163F, #19163F, #4E4988, #837BD0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+`;
+
+const TextArea = styled.textarea`
+  width: 100%;
+  height: 100%;
   background-color: #191034;
-  border: 1px solid;
-  border-image: linear-gradient(to bottom right, #837BD0, #4E4988, #19163F, #19163F, #4E4988, #837BD0) 1;
+  border: none;
   border-radius: 20px;
   padding: 20px 30px;
   font-family: 'Gilroy', sans-serif;
@@ -65,6 +109,8 @@ const TextArea = styled.textarea`
   font-size: 17px;
   color: #F6F5FF;
   resize: none;
+  position: relative;
+  z-index: 1;
   
   &::placeholder {
     color: #E8E6E6;
@@ -157,28 +203,34 @@ const Contact = () => {
           <ContactForm>
             <form onSubmit={handleSubmit}>
               <FormInputs>
-                <Input
-                  type="text"
-                  name="name"
-                  placeholder="Ваше имя*"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
-                <Input
-                  type="tel"
-                  name="phone"
-                  placeholder="+7 (___) __-__-___*"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                />
-                <TextArea
-                  name="message"
-                  placeholder="Оставьте свой вопрос здесь"
-                  value={formData.message}
-                  onChange={handleChange}
-                />
+                <InputWrapper>
+                  <Input
+                    type="text"
+                    name="name"
+                    placeholder="Ваше имя*"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                  />
+                </InputWrapper>
+                <InputWrapper>
+                  <Input
+                    type="tel"
+                    name="phone"
+                    placeholder="+7 (___) __-__-___*"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required
+                  />
+                </InputWrapper>
+                <TextAreaWrapper>
+                  <TextArea
+                    name="message"
+                    placeholder="Оставьте свой вопрос здесь"
+                    value={formData.message}
+                    onChange={handleChange}
+                  />
+                </TextAreaWrapper>
               </FormInputs>
               
               <CheckboxContainer>

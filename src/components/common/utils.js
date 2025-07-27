@@ -18,13 +18,9 @@ export const Container = styled.div`
 export const SectionTitle = styled.h2`
   font-family: 'Gilroy', sans-serif;
   font-weight: 400;
-  font-size: 80px;
+  font-size: 60px;
   line-height: 1em;
   margin-bottom: 20px;
-  
-  @media (max-width: 1024px) {
-    font-size: 60px;
-  }
   
   @media (max-width: 768px) {
     font-size: 40px;
@@ -38,11 +34,26 @@ export const SectionSubtitle = styled.div`
   
   .badge {
     background-color: rgba(103, 78, 180, 0.2);
-    border: 1.5px solid;
-    border-image: linear-gradient(to bottom right, #837BD0, #4E4988, #231F4D, #231F4D, #4E4988, #837BD0) 1;
+    position: relative;
     border-radius: 100px;
     padding: 10px 20px;
     backdrop-filter: blur(30px);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 100px;
+      padding: 1.5px;
+      background: linear-gradient(to bottom right, #837BD0, #4E4988, #231F4D, #231F4D, #4E4988, #837BD0);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
     
     span {
       font-family: 'Gilroy', sans-serif;
@@ -51,6 +62,8 @@ export const SectionSubtitle = styled.div`
       line-height: 1.3em;
       text-transform: uppercase;
       color: white;
+      position: relative;
+      z-index: 1;
     }
   }
   
@@ -83,7 +96,7 @@ export const SectionDescription = styled.p`
 
 export const Button = styled.button`
   background-color: #385EFF;
-  border: 1px solid #5E7DFE;
+  position: relative;
   border-radius: 20px;
   padding: 20px 30px;
   color: white;
@@ -92,9 +105,24 @@ export const Button = styled.button`
   font-size: 16px;
   text-transform: uppercase;
   cursor: pointer;
-  position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: #5E7DFE;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
   
   &::after {
     content: "";

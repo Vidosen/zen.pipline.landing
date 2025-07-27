@@ -4,53 +4,56 @@ import { Container, SectionTitle, SectionSubtitle, Button, SectionDescription } 
 
 const HeroSection = styled.section`
   padding: 120px 0 0;
-  min-height: 100vh;
   display: flex;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  background-color: transparent;
 `;
 
 const HeroContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 30px;
-  max-width: 600px;
+  max-width: 768px;
   position: relative;
   z-index: 10;
-`;
-
-const HeroImageContainer = styled.div`
-  position: absolute;
-  right: -20%;
-  top: -15%;
-  width: 100%;
-  height: 120%;
-  z-index: 1;
   
-  @media (max-width: 1200px) {
-    opacity: 0.4;
+  @media (max-width: 768px) {
+    max-width: 100%;
   }
 `;
 
-const HeroBg = styled.div`
-  position: absolute;
-  top: -5%;
-  right: -10%;
-  width: 879px;
-  height: 879px;
-  border-radius: 50%;
-  background-color: #221056;
-  filter: blur(500px);
-  z-index: 0;
-`;
-
+// Semi-transparent container for the call to action
 const CallToAction = styled.div`
-  background-color: rgba(25, 16, 52, 0.1);
-  border: 1px solid;
-  border-image: linear-gradient(to bottom right, #837BD0, #4E4988, #19163F, #19163F, #4E4988, #837BD0) 1;
+  background-color: rgba(25, 16, 52, 0.3);
+  position: relative;
   border-radius: 20px;
   padding: 30px;
-  backdrop-filter: blur(80px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(to bottom right, #837BD0, #4E4988, #19163F, #19163F, #4E4988, #837BD0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
+`;
+
+const ActionButton = styled(Button)`
   margin-top: 30px;
 `;
 
@@ -72,19 +75,10 @@ const Hero = () => {
             <SectionDescription>
               Автоматизируйте свои сборки без лишних хлопот. Заполните форму сейчас и получите пробный период бесплатно.
             </SectionDescription>
-            <Button>Оставить заявку</Button>
+            <ActionButton>Оставить заявку</ActionButton>
           </CallToAction>
         </HeroContent>
       </Container>
-      
-      <HeroBg />
-      <HeroImageContainer>
-        <img 
-          src="/images/hero-bg.png" 
-          alt="Mac device visualization"
-          style={{ maxWidth: '100%', height: 'auto' }}
-        />
-      </HeroImageContainer>
     </HeroSection>
   );
 };
