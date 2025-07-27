@@ -185,11 +185,7 @@ export const ScrollButton = styled(Link)`
 `;
 
 export const Section = styled.section`
-  padding: 120px 0;
-  
-  @media (max-width: 768px) {
-    padding: 80px 0;
-  }
+  padding: 60px 0;
 `;
 
 export const FlexRow = styled.div`

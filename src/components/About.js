@@ -8,11 +8,17 @@ const AboutSection = styled(Section)`
 
 const FeaturesGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-gap: 20px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
   margin-top: 70px;
   
+  @media (max-width: 1200px) {
+    gap: 40px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
   @media (max-width: 768px) {
+    gap: 40px;
     grid-template-columns: 1fr;
   }
 `;
@@ -22,12 +28,13 @@ const FeatureCard = styled.div`
   position: relative;
   border-radius: 20px;
   padding: 38px 26px;
-  height: 100%;
+  height: 175px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
   text-align: center;
+  width: 100%;
   
   &::before {
     content: '';
@@ -53,7 +60,6 @@ const FeatureIcon = styled.div`
   width: 60px;
   height: 60px;
   background: linear-gradient(to right bottom, #1F2553, #13183D, #13183D, #1F2553);
-  position: relative;
   border-radius: 60px;
   backdrop-filter: blur(17px);
   display: flex;
@@ -104,6 +110,7 @@ const FeatureTitle = styled.h3`
   color: #F6F5FF;
   max-width: 243px;
   margin: 0 auto;
+  white-space: pre-line;
 `;
 
 const About = () => {
@@ -121,7 +128,7 @@ const About = () => {
     {
       id: 3,
       icon: '/images/icon-3.svg',
-      title: 'Простая настройка с минимальной конфигурацией'
+      title: 'Простая настройка \nс минимальной конфигурацией'
     },
     {
       id: 4,
