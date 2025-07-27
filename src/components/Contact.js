@@ -40,32 +40,38 @@ const FormInputs = styled.div`
   margin-bottom: 30px;
 `;
 
+// Base input wrapper with gradient border - new implementation
 const InputWrapper = styled.div`
   position: relative;
   width: 100%;
   height: 70px;
   border-radius: 100px;
+  background: 
+    linear-gradient(#191034, #191034) padding-box,
+    linear-gradient(to bottom right, #837BD0, #4E4988, #231F4D, #231F4D, #4E4988, #837BD0) border-box;
+  border: 1.5px solid transparent;
+  transition: border 0.3s ease, background 0.3s ease;
   
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 100px;
-    padding: 1px;
-    background: linear-gradient(to bottom right, #837BD0, #4E4988, #19163F, #19163F, #4E4988, #837BD0);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
+  /* Hover state */
+  &:hover {
+    background: 
+      linear-gradient(#241A40, #241A40) padding-box,
+      linear-gradient(to bottom right, #837BD0, #4E4988, #4E4988, #837BD0) border-box;
+  }
+  
+  /* Focus state */
+  &:focus-within {
+    background: 
+      linear-gradient(#191034, #191034) padding-box,
+      linear-gradient(to bottom right, #837BD0, #4E4988, #4E4988, #837BD0) border-box;
   }
 `;
 
+// Base input styling
 const Input = styled.input`
   width: 100%;
   height: 100%;
-  background-color: #191034;
+  background: transparent;
   border: none;
   border-radius: 100px;
   padding: 20px 30px;
@@ -73,45 +79,36 @@ const Input = styled.input`
   font-weight: 300;
   font-size: 17px;
   color: #F6F5FF;
-  position: relative;
-  z-index: 1;
   
   &::placeholder {
     color: #E8E6E6;
     opacity: 0.7;
+    transition: all 0.3s ease;
   }
   
   &:focus {
     outline: none;
   }
+  
+  /* Focus state styling */
+  &:focus::placeholder {
+    font-size: 12px;
+    transform: translateY(-8px);
+    color: #CAC3C3;
+    opacity: 1;
+  }
 `;
 
-const TextAreaWrapper = styled.div`
-  position: relative;
-  width: 100%;
+// Text area wrapper with same styling as input but different border radius
+const TextAreaWrapper = styled(InputWrapper)`
   height: 200px;
   border-radius: 20px;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 20px;
-    padding: 1px;
-    background: linear-gradient(to bottom right, #837BD0, #4E4988, #19163F, #19163F, #4E4988, #837BD0);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-  }
 `;
 
 const TextArea = styled.textarea`
   width: 100%;
   height: 100%;
-  background-color: #191034;
+  background: transparent;
   border: none;
   border-radius: 20px;
   padding: 20px 30px;
@@ -120,16 +117,22 @@ const TextArea = styled.textarea`
   font-size: 17px;
   color: #F6F5FF;
   resize: none;
-  position: relative;
-  z-index: 1;
   
   &::placeholder {
     color: #E8E6E6;
     opacity: 0.7;
+    transition: all 0.3s ease;
   }
   
   &:focus {
     outline: none;
+  }
+  
+  &:focus::placeholder {
+    font-size: 12px;
+    transform: translateY(-8px);
+    color: #CAC3C3;
+    opacity: 1;
   }
 `;
 
@@ -146,6 +149,11 @@ const Checkbox = styled.input`
   border: 1px solid #CAC3C3;
   border-radius: 4px;
   margin-top: 3px;
+  cursor: pointer;
+  
+  &:checked {
+    accent-color: #4E4988;
+  }
 `;
 
 const CheckboxLabel = styled.label`
@@ -153,6 +161,7 @@ const CheckboxLabel = styled.label`
   font-weight: 300;
   font-size: 17px;
   color: #E8E6E6;
+  cursor: pointer;
 `;
 
 const ContactImageWrapper = styled.div`
