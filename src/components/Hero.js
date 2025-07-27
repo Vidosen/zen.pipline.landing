@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Container, SectionTitle, SectionSubtitle, Button, SectionDescription } from './common/utils';
+import { Container, SectionTitle, SectionSubtitle, SectionDescription } from './common/utils';
+import ShinyButton from './Hero/ShinyButton';
 
 const HeroSection = styled.section`
   padding: 120px 0 0;
@@ -13,7 +14,7 @@ const HeroSection = styled.section`
 const HeroContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 40px;
   max-width: 768px;
   position: relative;
   z-index: 10;
@@ -25,12 +26,12 @@ const HeroContent = styled.div`
 
 // Semi-transparent container for the call to action
 const CallToAction = styled.div`
-  background-color: rgba(25, 16, 52, 0.3);
+  background-color: rgba(25, 16, 52, 0.2);
   position: relative;
   border-radius: 20px;
-  padding: 30px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  padding: 30px 40px;
+  backdrop-filter: blur(30px);
+  margin-top: 10px;
   
   &::before {
     content: '';
@@ -49,12 +50,12 @@ const CallToAction = styled.div`
   }
   
   @media (max-width: 768px) {
-    padding: 20px;
+    padding: 25px;
   }
 `;
 
-const ActionButton = styled(Button)`
-  margin-top: 30px;
+const ActionButtonWrapper = styled.div`
+  margin-top: 40px;
 `;
 
 const Hero = () => {
@@ -75,7 +76,16 @@ const Hero = () => {
             <SectionDescription>
               Автоматизируйте свои сборки без лишних хлопот. Заполните форму сейчас и получите пробный период бесплатно.
             </SectionDescription>
-            <ActionButton>Оставить заявку</ActionButton>
+            <ActionButtonWrapper>
+              <ShinyButton 
+                to="contact" 
+                smooth={true} 
+                duration={800} 
+                offset={-50}
+              >
+                Оставить заявку
+              </ShinyButton>
+            </ActionButtonWrapper>
           </CallToAction>
         </HeroContent>
       </Container>

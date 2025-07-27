@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Container, Section, SectionTitle, SectionSubtitle, SectionDescription, Button } from './common/utils';
+import { Container, SectionTitle, SectionSubtitle, SectionDescription, Button } from './common/utils';
 
-const ContactSection = styled(Section)`
+const ContactSection = styled.section`
+  padding: 120px 0;
   position: relative;
+  
+  @media (max-width: 768px) {
+    padding: 80px 0;
+  }
 `;
 
 const ContactContainer = styled.div`

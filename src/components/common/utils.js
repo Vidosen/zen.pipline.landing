@@ -1,4 +1,6 @@
-import styled from 'styled-components';
+import React from 'react';
+import styled, { keyframes } from 'styled-components';
+import { Link } from 'react-scroll';
 
 export const Container = styled.div`
   max-width: 1240px;
@@ -94,52 +96,91 @@ export const SectionDescription = styled.p`
   }
 `;
 
+// Shiny gradient animation
+const shineAnimation = keyframes`
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+`;
+
 export const Button = styled.button`
-  background-color: #385EFF;
-  position: relative;
-  border-radius: 20px;
-  padding: 20px 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 32px;
+  background: linear-gradient(90deg, #4D6AFF 0%, #6A5AFF 100%);
+  border-radius: 8px;
+  border: none;
   color: white;
-  font-family: 'Gilroy', sans-serif;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 16px;
-  text-transform: uppercase;
   cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(77, 106, 255, 0.4);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(77, 106, 255, 0.4);
+  }
+`;
+
+// ScrollLink component that combines styled button with react-scroll
+export const ScrollButton = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 32px;
+  background: linear-gradient(90deg, #4D6AFF 0%, #6A5AFF 100%);
+  position: relative;
+  border-radius: 8px;
+  border: none;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
   overflow: hidden;
-  transition: all 0.3s ease;
   
   &::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 20px;
-    padding: 1px;
-    background: #5E7DFE;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-  }
-  
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
     width: 100%;
-    height: 31px;
-    background-color: #15113D;
-    filter: blur(40px);
-    border-radius: 0 0 30px 30px;
-    z-index: -1;
+    height: 100%;
+    background: linear-gradient(
+      90deg, 
+      transparent, 
+      rgba(255, 255, 255, 0.2), 
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: ${shineAnimation} 3s linear infinite;
+    pointer-events: none;
   }
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 15px rgba(77, 106, 255, 0.5);
+    &::before {
+      animation: ${shineAnimation} 1.5s linear infinite;
+    }
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(77, 106, 255, 0.5);
+    &::before {
+      animation: none;
+    }
   }
 `;
 
@@ -163,4 +204,4 @@ export const FlexRow = styled.div`
 export const FlexColumn = styled.div`
   display: flex;
   flex-direction: column;
-`; 
+`;
