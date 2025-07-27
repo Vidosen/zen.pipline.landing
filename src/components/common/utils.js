@@ -2,33 +2,60 @@ import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Link } from 'react-scroll';
 
+// Common container component
 export const Container = styled.div`
-  max-width: 1240px;
-  width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 98px;
+  padding: 0 15px;
+  width: 100%;
   
-  @media (max-width: 1024px) {
-    padding: 0 40px;
+  @media (max-width: 1440px) {
+    max-width: 1200px;
+  }
+  
+  @media (max-width: 1200px) {
+    max-width: 960px;
+  }
+  
+  @media (max-width: 992px) {
+    max-width: 720px;
   }
   
   @media (max-width: 768px) {
+    max-width: 540px;
+  }
+  
+  @media (max-width: 576px) {
+    max-width: 100%;
     padding: 0 20px;
   }
 `;
 
+// Section titles
 export const SectionTitle = styled.h2`
   font-family: 'Gilroy', sans-serif;
   font-weight: 400;
-  font-size: 60px;
+  font-size: 80px;
   line-height: 1em;
-  margin-bottom: 20px;
+  color: #FFF;
+  margin-top: 0;
+  margin-bottom: 50px;
+  
+  @media (max-width: 992px) {
+    font-size: 60px;
+  }
   
   @media (max-width: 768px) {
+    font-size: 48px;
+  }
+  
+  @media (max-width: 576px) {
     font-size: 40px;
+    margin-bottom: 30px;
   }
 `;
 
+// Section subtitles with badge
 export const SectionSubtitle = styled.div`
   position: relative;
   display: inline-flex;
@@ -73,30 +100,38 @@ export const SectionSubtitle = styled.div`
     position: absolute;
     bottom: -14px;
     left: 0;
-    width: 100%;
+    right: 0;
     height: 18px;
     background-color: rgba(21, 17, 61, 0.9);
     filter: blur(40px);
-    border-radius: 0 0 20px 20px;
-    z-index: -1;
   }
 `;
 
+// Section description text
 export const SectionDescription = styled.p`
   font-family: 'Gilroy', sans-serif;
   font-weight: 300;
   font-size: 26px;
   line-height: 1.3em;
   color: #F6F5FF;
-  margin-bottom: 30px;
-  max-width: 800px;
+  margin-top: 0;
+  margin-bottom: 0;
+  max-width: 870px;
+  
+  @media (max-width: 992px) {
+    font-size: 22px;
+  }
   
   @media (max-width: 768px) {
     font-size: 20px;
   }
+  
+  @media (max-width: 576px) {
+    font-size: 18px;
+  }
 `;
 
-// Shiny gradient animation
+// Shiny animation for buttons
 const shineAnimation = keyframes`
   0% {
     background-position: -200% center;
@@ -106,48 +141,25 @@ const shineAnimation = keyframes`
   }
 `;
 
+// Standard button
 export const Button = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 16px 32px;
-  background: linear-gradient(90deg, #4D6AFF 0%, #6A5AFF 100%);
-  border-radius: 8px;
-  border: none;
-  color: white;
-  font-weight: 600;
-  font-size: 16px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 10px rgba(77, 106, 255, 0.4);
-  }
-  
-  &:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 5px rgba(77, 106, 255, 0.4);
-  }
-`;
-
-// ScrollLink component that combines styled button with react-scroll
-export const ScrollButton = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px 32px;
-  background: linear-gradient(90deg, #4D6AFF 0%, #6A5AFF 100%);
+  background-color: #385EFF;
   position: relative;
-  border-radius: 8px;
+  border-radius: 20px;
+  padding: 20px 30px;
   border: none;
   color: white;
-  font-weight: 600;
+  font-family: 'Gilroy', sans-serif;
+  font-weight: 500;
   font-size: 16px;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
   text-decoration: none;
   overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   
   &::before {
     content: '';
@@ -167,9 +179,22 @@ export const ScrollButton = styled(Link)`
     pointer-events: none;
   }
   
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 31px;
+    background-color: #15113D;
+    filter: blur(40px);
+    border-radius: 0 0 30px 30px;
+    z-index: -1;
+  }
+  
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(77, 106, 255, 0.5);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
     &::before {
       animation: ${shineAnimation} 1.5s linear infinite;
     }
@@ -177,11 +202,18 @@ export const ScrollButton = styled(Link)`
   
   &:active {
     transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(77, 106, 255, 0.5);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     &::before {
       animation: none;
     }
   }
+`;
+
+// Form submit button with the same shiny effect
+export const FormSubmitButton = styled(Button)`
+  width: 203px;
+  height: 65px;
+  border: 1px solid #5E7DFE;
 `;
 
 export const Section = styled.section`

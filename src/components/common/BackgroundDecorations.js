@@ -138,6 +138,25 @@ const HeroGradientElement = styled.div`
   opacity: ${props => props.isVisible ? '1' : '0'};
 `;
 
+// New component for Contact section decorations
+const ContactImageContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 0;
+  transition: opacity 0.8s ease-in-out, transform 1s ease-out;
+  opacity: ${props => props.isVisible ? '1' : '0'};
+  transform: ${props => props.isVisible ? 'translateX(0)' : 'translateX(50px)'};
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+`;
+
 const BackgroundDecorations = ({ sectionId = "home" }) => {
   // Start with elements hidden for initial animation
   const [isVisible, setIsVisible] = useState(false);
@@ -201,6 +220,45 @@ const BackgroundDecorations = ({ sectionId = "home" }) => {
         <img src="/images/hero-element.png" alt="Gradient element" />
       </HeroGradientElement>
     </DecorationsContainer>
+  );
+};
+
+// Separate component for Contact section decorations
+export const ContactDecorations = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  
+  // Scroll-based visibility
+  useEffect(() => {
+    const checkScroll = () => {
+      // Get the contact section element
+      const contactSection = document.getElementById('contact');
+      if (!contactSection) return;
+      
+      // Calculate visibility based on scroll position
+      const rect = contactSection.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      if (rect.top < windowHeight * 0.75) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+    
+    // Run once on mount
+    checkScroll();
+    
+    // Add scroll listener
+    window.addEventListener('scroll', checkScroll);
+    
+    // Clean up
+    return () => window.removeEventListener('scroll', checkScroll);
+  }, []);
+  
+  return (
+    <ContactImageContainer isVisible={isVisible}>
+      <img src="/images/contact-image.jpg" alt="Contact us" />
+    </ContactImageContainer>
   );
 };
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Container, SectionTitle, SectionSubtitle, SectionDescription, Button } from './common/utils';
+import { Container, SectionTitle, SectionSubtitle, SectionDescription, FormSubmitButton } from './common/utils';
+import { ContactDecorations } from './common/BackgroundDecorations';
 
 const ContactSection = styled.section`
   padding: 120px 0;
@@ -15,6 +16,11 @@ const ContactContainer = styled.div`
   display: flex;
   justify-content: space-between;
   margin-top: 75px;
+  gap: 235px;
+  
+  @media (max-width: 1200px) {
+    gap: 100px;
+  }
   
   @media (max-width: 1024px) {
     flex-direction: column;
@@ -149,17 +155,10 @@ const CheckboxLabel = styled.label`
   color: #E8E6E6;
 `;
 
-const ContactImage = styled.div`
+const ContactImageWrapper = styled.div`
   flex: 1;
   height: 750px;
   position: relative;
-  
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-  }
   
   @media (max-width: 1024px) {
     height: 500px;
@@ -252,13 +251,13 @@ const Contact = () => {
                 </CheckboxLabel>
               </CheckboxContainer>
               
-              <Button type="submit">Перезвоните мне</Button>
+              <FormSubmitButton type="submit">Перезвоните мне</FormSubmitButton>
             </form>
           </ContactForm>
           
-          <ContactImage>
-            <img src="/images/contact-image.jpg" alt="Contact us" />
-          </ContactImage>
+          <ContactImageWrapper>
+            <ContactDecorations />
+          </ContactImageWrapper>
         </ContactContainer>
       </Container>
     </ContactSection>

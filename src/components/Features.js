@@ -6,21 +6,45 @@ const FeaturesSection = styled(Section)`
   position: relative;
 `;
 
-const FeaturesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-gap: 130px 128px;
+const FeaturesContainer = styled.div`
+  display: flex;
+  justify-content: center;
   margin-top: 80px;
-  padding: 0 106px 0 208px;
+  gap: 128px;
   
   @media (max-width: 1200px) {
-    padding: 0;
-    grid-gap: 80px 40px;
+    gap: 80px;
   }
   
   @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    grid-gap: 60px;
+    flex-direction: column;
+    gap: 60px;
+  }
+`;
+
+const FeaturesColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 130px;
+  
+  &:nth-child(2) {
+    margin-top: ${props => props.offset ? '150px' : '0'};
+  }
+  
+  @media (max-width: 1200px) {
+    gap: 80px;
+    
+    &:nth-child(2) {
+      margin-top: ${props => props.offset ? '100px' : '0'};
+    }
+  }
+  
+  @media (max-width: 768px) {
+    gap: 60px;
+    
+    &:nth-child(2) {
+      margin-top: 0;
+    }
   }
 `;
 
@@ -34,6 +58,19 @@ const FeatureCard = styled.div`
   position: relative;
   border-radius: 20px;
   background-color: transparent;
+  width: 400px;
+  
+  @media (max-width: 1200px) {
+    width: 350px;
+  }
+  
+  @media (max-width: 992px) {
+    width: 300px;
+  }
+  
+  @media (max-width: 768px) {
+    width: 100%;
+  }
   
   &::before {
     content: '';
@@ -97,34 +134,37 @@ const Features = () => {
     {
       id: 1,
       title: 'Оптимизируйте расходы',
-      icon: '/images/feature-1.svg',
+      icon: '/images/feature-1-new.svg',
       description: 'Возможность сборки без необходимости приобретать дорогостоящую продукцию'
     },
     {
       id: 2,
       title: 'Всё готово к работе',
-      icon: '/images/feature-2.svg',
+      icon: '/images/feature-2-new.svg',
       description: 'Доступ к надежной и масштабируемой инфраструктуре'
     },
     {
       id: 3,
       title: 'МЫ на связи',
-      icon: '/images/feature-3.svg',
+      icon: '/images/feature-3-new.svg',
       description: 'Экспертная поддержка для ваших потребностей в разработке'
     },
     {
       id: 4,
       title: 'Ускорьте свою разработку',
-      icon: '/images/feature-4.svg',
+      icon: '/images/feature-4-new.svg',
       description: 'Экономия времени и ресурсов на управлении сборками'
     },
     {
       id: 5,
       title: 'Оплата без проблем',
-      icon: '/images/feature-5.svg',
+      icon: '/images/feature-5-new.svg',
       description: 'Удобные способы оплаты картой РФ, СБП, а так же криптовалютами'
     }
   ];
+
+  const firstColumnFeatures = features.slice(0, 3);
+  const secondColumnFeatures = features.slice(3);
 
   return (
     <FeaturesSection id="features">
@@ -143,24 +183,45 @@ const Features = () => {
         </SectionDescription>
       </Container>
       
-      <FeaturesGrid>
-        {features.map(feature => (
-          <FeatureCard key={feature.id}>
-            <FeatureIconContainer>
-              <SectionSubtitle>
-                <div className="badge">
-                  <span>{feature.title}</span>
-                </div>
-                <div className="shadow"></div>
-              </SectionSubtitle>
-            </FeatureIconContainer>
-            <FeatureIcon>
-              <img src={feature.icon} alt={feature.title} />
-            </FeatureIcon>
-            <FeatureDescription>{feature.description}</FeatureDescription>
-          </FeatureCard>
-        ))}
-      </FeaturesGrid>
+      <FeaturesContainer>
+        <FeaturesColumn>
+          {firstColumnFeatures.map(feature => (
+            <FeatureCard key={feature.id}>
+              <FeatureIconContainer>
+                <SectionSubtitle>
+                  <div className="badge">
+                    <span>{feature.title}</span>
+                  </div>
+                  <div className="shadow"></div>
+                </SectionSubtitle>
+              </FeatureIconContainer>
+              <FeatureIcon>
+                <img src={feature.icon} alt={feature.title} />
+              </FeatureIcon>
+              <FeatureDescription>{feature.description}</FeatureDescription>
+            </FeatureCard>
+          ))}
+        </FeaturesColumn>
+        
+        <FeaturesColumn offset>
+          {secondColumnFeatures.map(feature => (
+            <FeatureCard key={feature.id}>
+              <FeatureIconContainer>
+                <SectionSubtitle>
+                  <div className="badge">
+                    <span>{feature.title}</span>
+                  </div>
+                  <div className="shadow"></div>
+                </SectionSubtitle>
+              </FeatureIconContainer>
+              <FeatureIcon>
+                <img src={feature.icon} alt={feature.title} />
+              </FeatureIcon>
+              <FeatureDescription>{feature.description}</FeatureDescription>
+            </FeatureCard>
+          ))}
+        </FeaturesColumn>
+      </FeaturesContainer>
     </FeaturesSection>
   );
 };

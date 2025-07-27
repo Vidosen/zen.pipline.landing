@@ -63,12 +63,6 @@ const Hero = () => {
     <HeroSection id="home">
       <Container>
         <HeroContent>
-          <SectionSubtitle>
-            <div className="badge">
-              <span>Сборки без компромиссов</span>
-            </div>
-            <div className="shadow"></div>
-          </SectionSubtitle>
           
           <SectionTitle>Облачные сборки для iOS и macOS</SectionTitle>
           
