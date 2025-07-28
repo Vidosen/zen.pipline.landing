@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Container, SectionTitle, SectionSubtitle, SectionDescription } from './common/utils';
 import ShinyButton from './Hero/ShinyButton';
+import HeroBackgroundDecorations from './common/BackgroundDecorations';
 
 const HeroSection = styled.section`
   padding: 120px 0 0;
@@ -9,6 +10,7 @@ const HeroSection = styled.section`
   position: relative;
   overflow: visible;
   background-color: transparent;
+  min-height: 80vh;
 `;
 
 const HeroContent = styled.div`
@@ -58,6 +60,24 @@ const ActionButtonWrapper = styled.div`
   margin-top: 40px;
 `;
 
+const HeroDecorationWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 1;
+  
+  /* Ensure content in the wrapper doesn't affect the Hero section's height */
+  & > * {
+    position: absolute;
+  }
+`;
+
 const Hero = () => {
   return (
     <HeroSection id="home">
@@ -83,6 +103,11 @@ const Hero = () => {
           </CallToAction>
         </HeroContent>
       </Container>
+      
+      {/* Move the decorations wrapper to be the last child */}
+      <HeroDecorationWrapper>
+        <HeroBackgroundDecorations sectionId="home" />
+      </HeroDecorationWrapper>
     </HeroSection>
   );
 };

@@ -43,7 +43,7 @@ const Logo = styled.div`
     left: 42px;
     width: 48px;
     height: 48px;
-    filter: blur(6  px);
+    filter: blur(6px);
   }
   
   .logo-svg {

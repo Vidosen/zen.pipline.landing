@@ -166,11 +166,32 @@ const CheckboxLabel = styled.label`
 
 const ContactImageWrapper = styled.div`
   flex: 1;
-  height: 750px;
   position: relative;
   
   @media (max-width: 1024px) {
-    height: 500px;
+    display: none;
+  }
+`;
+
+const ContactDecorationWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 1;
+  
+  /* Ensure content in the wrapper doesn't affect height */
+  & > * {
+    position: absolute;
+  }
+  
+  @media (max-width: 1024px) {
+    display: none;
   }
 `;
 
@@ -265,7 +286,9 @@ const Contact = () => {
           </ContactForm>
           
           <ContactImageWrapper>
-            <ContactDecorations />
+            <ContactDecorationWrapper>
+              <ContactDecorations />
+            </ContactDecorationWrapper>
           </ContactImageWrapper>
         </ContactContainer>
       </Container>

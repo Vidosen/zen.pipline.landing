@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-// Container with animation capabilities
+// Container for hero decorations
 const DecorationsContainer = styled.div`
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   pointer-events: none;
-  z-index: 1;
+  z-index: -1;
   overflow: visible;
   opacity: ${props => props.isVisible ? '1' : '0'};
   transition: opacity 0.8s ease-in-out;
@@ -18,7 +18,7 @@ const DecorationsContainer = styled.div`
 // This is the main visual background element - large purple ellipse
 const HeroEllipse = styled.div`
   position: absolute;
-  top: -21px;
+  top: -150px; /* Adjusted to overflow more visibly */
   left: 164px;
   width: 879px;
   height: 879px;
@@ -116,7 +116,7 @@ const HeroDecorativeElement = styled.div`
 // The spiral image
 const HeroGradientElement = styled.div`
   position: absolute;
-  top: 435px;
+  top: 395px;
   left: 20%;
   width: 500px;
   height: 500px;
@@ -140,10 +140,12 @@ const HeroGradientElement = styled.div`
 
 // New component for Contact section decorations
 const ContactImageContainer = styled.div`
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow: visible;
   border-radius: 0;
   transition: opacity 0.8s ease-in-out, transform 1s ease-out;
   opacity: ${props => props.isVisible ? '1' : '0'};
@@ -151,54 +153,49 @@ const ContactImageContainer = styled.div`
   
   img {
     width: 100%;
-    height: 100%;
+    height: auto;
     object-fit: cover;
     object-position: center;
+    min-height: 100%;
+  }
+  
+  @media (max-width: 1024px) {
+    display: none;
   }
 `;
 
-const BackgroundDecorations = ({ sectionId = "home" }) => {
-  // Start with elements hidden for initial animation
-  const [isVisible, setIsVisible] = useState(false);
-  
-  // Initial load animation
-  useEffect(() => {
-    // Short delay before showing the elements on page load
-    const initialAnimationTimer = setTimeout(() => {
-      setIsVisible(true);
-    }, 300);
-    
-    return () => clearTimeout(initialAnimationTimer);
-  }, []);
+const HeroBackgroundDecorations = ({ sectionId = "home" }) => {
+  const [isVisible, setIsVisible] = useState(true); // Start visible by default
   
   // Scroll-based visibility
   useEffect(() => {
     const checkScroll = () => {
       // Get the hero section element
-      const heroSection = document.getElementById('home');
+      const heroSection = document.getElementById(sectionId);
       if (!heroSection) return;
       
       // Calculate visibility based on scroll position
-      const heroRect = heroSection.getBoundingClientRect();
-      const heroTop = heroRect.top;
-      const heroHeight = heroRect.height;
+      const rect = heroSection.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
       
-      if (heroTop > -heroHeight + 600) {
+      // Show when any part of the section is in the viewport
+      // or just slightly outside of it to account for overflow elements
+      if (rect.bottom > -300 && rect.top < windowHeight + 300) {
         setIsVisible(true);
       } else {
         setIsVisible(false);
       }
     };
     
-    // Run once on mount
-    checkScroll();
-    
     // Add scroll listener
     window.addEventListener('scroll', checkScroll);
     
+    // Initial check
+    checkScroll();
+    
     // Clean up
     return () => window.removeEventListener('scroll', checkScroll);
-  }, []);
+  }, [sectionId]);
   
   return (
     <DecorationsContainer id={`${sectionId}-decorations`} isVisible={isVisible}>
@@ -225,7 +222,7 @@ const BackgroundDecorations = ({ sectionId = "home" }) => {
 
 // Separate component for Contact section decorations
 export const ContactDecorations = () => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true); // Start visible by default
   
   // Scroll-based visibility
   useEffect(() => {
@@ -238,18 +235,20 @@ export const ContactDecorations = () => {
       const rect = contactSection.getBoundingClientRect();
       const windowHeight = window.innerHeight;
       
-      if (rect.top < windowHeight * 0.75) {
+      // Show when any part of the section is in the viewport
+      // or just slightly outside of it to account for overflow elements
+      if (rect.bottom > -300 && rect.top < windowHeight + 300) {
         setIsVisible(true);
       } else {
         setIsVisible(false);
       }
     };
     
-    // Run once on mount
-    checkScroll();
-    
     // Add scroll listener
     window.addEventListener('scroll', checkScroll);
+    
+    // Initial check
+    checkScroll();
     
     // Clean up
     return () => window.removeEventListener('scroll', checkScroll);
@@ -262,4 +261,4 @@ export const ContactDecorations = () => {
   );
 };
 
-export default BackgroundDecorations; 
+export default HeroBackgroundDecorations; 
