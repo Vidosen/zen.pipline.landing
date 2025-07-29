@@ -10,7 +10,7 @@ const DecorationsContainer = styled.div`
   height: 100%;
   pointer-events: none;
   z-index: -1;
-  overflow: visible;
+  overflow: hidden;
   opacity: ${props => props.isVisible ? '1' : '0'};
   transition: opacity 0.8s ease-in-out;
 `;
@@ -84,6 +84,7 @@ const MacImage = styled.div`
     object-fit: cover;
   }
   
+
   transition: transform 1s ease-out;
   transform: ${props => props.isVisible ? 'translateX(0)' : 'translateX(120px)'};
   opacity: 1; /* Always fully visible */

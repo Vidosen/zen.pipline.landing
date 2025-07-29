@@ -8,9 +8,10 @@ const HeroSection = styled.section`
   padding: 120px 0 0;
   display: flex;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
   background-color: transparent;
   min-height: 80vh;
+  width: 100%;
 `;
 
 const HeroContent = styled.div`
@@ -69,7 +70,7 @@ const HeroDecorationWrapper = styled.div`
   width: 100%;
   height: 100%;
   pointer-events: none;
-  overflow: visible;
+  overflow: hidden;
   z-index: 1;
   
   /* Ensure content in the wrapper doesn't affect the Hero section's height */

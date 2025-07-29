@@ -11,14 +11,21 @@ const FeaturesContainer = styled.div`
   justify-content: center;
   margin-top: 80px;
   gap: 128px;
+  width: 100%;
+  max-width: 100%;
   
   @media (max-width: 1200px) {
     gap: 80px;
   }
   
+  @media (max-width: 992px) {
+    gap: 40px;
+  }
+  
   @media (max-width: 768px) {
     flex-direction: column;
     gap: 60px;
+    align-items: center;
   }
 `;
 
@@ -59,6 +66,7 @@ const FeatureCard = styled.div`
   border-radius: 20px;
   background-color: transparent;
   width: 400px;
+  max-width: 100%;
   
   @media (max-width: 1200px) {
     width: 350px;
@@ -70,6 +78,16 @@ const FeatureCard = styled.div`
   
   @media (max-width: 768px) {
     width: 100%;
+    max-width: 350px;
+    margin: 0 auto;
+  }
+  
+  @media (max-width: 480px) {
+    width: calc(100vw - 40px);
+    max-width: 300px;
+    padding: 40px 0;
+    height: auto;
+    min-height: 280px;
   }
   
   &::before {
