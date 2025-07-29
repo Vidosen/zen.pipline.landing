@@ -111,11 +111,7 @@ const FeatureIcon = styled.div`
   }
 `;
 
-const FeatureTitle = styled.div`
-  position: absolute;
-  top: -30px;
-  left: 30px;
-`;
+
 
 const FeatureDescription = styled.p`
   font-family: 'Gilroy', sans-serif;

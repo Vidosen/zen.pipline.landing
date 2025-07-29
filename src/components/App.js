@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-scroll';
 import Header from './Header';
 import Hero from './Hero';
 import About from './About';

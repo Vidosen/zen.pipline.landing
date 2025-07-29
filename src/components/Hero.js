@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Container, SectionTitle, SectionSubtitle, SectionDescription } from './common/utils';
+import { Container, SectionTitle, SectionDescription } from './common/utils';
 import ShinyButton from './Hero/ShinyButton';
 import HeroBackgroundDecorations from './common/BackgroundDecorations';
 
@@ -88,7 +88,7 @@ const Hero = () => {
           
           <CallToAction>
             <SectionDescription>
-              Автоматизируйте свои сборки без лишних хлопот. Заполните форму сейчас и получите пробный период бесплатно.
+              Автоматизируйте свои сборки без лишних хлопот. Станьте частью beta-тестирования и получите пробный период бесплатно.
             </SectionDescription>
             <ActionButtonWrapper>
               <ShinyButton 

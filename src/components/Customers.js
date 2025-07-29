@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Container, Section, SectionTitle, SectionSubtitle, SectionDescription, Button } from './common/utils';
+import { Container, Section, SectionTitle, SectionSubtitle, SectionDescription } from './common/utils';
 
 const CustomersSection = styled(Section)`
   position: relative;
@@ -25,23 +25,6 @@ const HeadingsContainer = styled.div`
 
 const SectionMainDescription = styled(SectionDescription)`
   color: #F6F5FF;
-`;
-
-const CustomerCardsWrapper = styled.div`
-  position: relative;
-  padding: 0 212px 0 106px;
-  
-  @media (max-width: 1400px) {
-    padding: 0 100px 0 50px;
-  }
-  
-  @media (max-width: 1200px) {
-    padding: 0 50px 0 20px;
-  }
-  
-  @media (max-width: 768px) {
-    padding: 0;
-  }
 `;
 
 const CustomerCardsContainer = styled.div`

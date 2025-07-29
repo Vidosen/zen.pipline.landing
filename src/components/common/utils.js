@@ -1,6 +1,4 @@
-import React from 'react';
 import styled, { keyframes } from 'styled-components';
-import { Link } from 'react-scroll';
 
 // Common container component
 export const Container = styled.div`
@@ -214,6 +212,21 @@ export const FormSubmitButton = styled(Button)`
   width: 203px;
   height: 65px;
   border: 1px solid #5E7DFE;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
+    
+    &::before {
+      animation: none;
+    }
+  }
 `;
 
 export const Section = styled.section`

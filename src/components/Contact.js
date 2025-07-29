@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Container, SectionTitle, SectionSubtitle, SectionDescription, FormSubmitButton } from './common/utils';
 import { ContactDecorations } from './common/BackgroundDecorations';
+import SuccessModal from './SuccessModal';
 
 const ContactSection = styled.section`
   padding: 120px 0;
@@ -99,43 +100,6 @@ const Input = styled.input`
   }
 `;
 
-// Text area wrapper with same styling as input but different border radius
-const TextAreaWrapper = styled(InputWrapper)`
-  height: 200px;
-  border-radius: 20px;
-`;
-
-const TextArea = styled.textarea`
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  border: none;
-  border-radius: 20px;
-  padding: 20px 30px;
-  font-family: 'Gilroy', sans-serif;
-  font-weight: 300;
-  font-size: 17px;
-  color: #F6F5FF;
-  resize: none;
-  
-  &::placeholder {
-    color: #E8E6E6;
-    opacity: 0.7;
-    transition: all 0.3s ease;
-  }
-  
-  &:focus {
-    outline: none;
-  }
-  
-  &:focus::placeholder {
-    font-size: 12px;
-    transform: translateY(-8px);
-    color: #CAC3C3;
-    opacity: 1;
-  }
-`;
-
 const CheckboxContainer = styled.div`
   display: flex;
   align-items: flex-start;
@@ -198,10 +162,14 @@ const ContactDecorationWrapper = styled.div`
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
     phone: '',
-    message: '',
+    company: '',
     agreement: false
   });
+  
+  const [showModal, setShowModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -211,10 +179,63 @@ const Contact = () => {
     }));
   };
   
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log(formData);
+    
+    if (isSubmitting) return; // Предотвращаем двойную отправку
+    
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...formData,
+          // Добавляем UTM параметры из URL
+          utm_source: new URLSearchParams(window.location.search).get('utm_source'),
+          utm_medium: new URLSearchParams(window.location.search).get('utm_medium'),
+          utm_campaign: new URLSearchParams(window.location.search).get('utm_campaign')
+        })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Очищаем форму
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          company: '',
+          agreement: false
+        });
+        
+        // Показываем модальное окно
+        setShowModal(true);
+        
+        // Top.Mail.Ru событие конверсии
+        if (window._tmr) {
+          window._tmr.push({
+            type: 'reachGoal',
+            id: 3659683,
+            goal: 'lead_submitted'
+          });
+        }
+        
+        console.log('Lead submitted successfully:', result);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Ошибка сервера');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Произошла ошибка при отправке заявки. Попробуйте еще раз или напишите нам напрямую.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   return (
@@ -222,15 +243,15 @@ const Contact = () => {
       <Container>
         <SectionSubtitle>
           <div className="badge">
-            <span>Ответим на ваши вопросы</span>
+            <span>Станьте частью beta-тестирования</span>
           </div>
           <div className="shadow"></div>
         </SectionSubtitle>
         
-        <SectionTitle>Получите ответы на ваши вопросы</SectionTitle>
+        <SectionTitle>Получите ранний доступ к платформе</SectionTitle>
         
         <SectionDescription>
-          Если у вас остались вопросы — заполните форму ниже. Наш менеджер свяжется с вами в ближайшее время для уточнения деталей.
+          Зарегистрируйтесь сейчас и получите приоритетный доступ к платформе облачных сборок iOS и macOS. Первые 100 пользователей получат <u>бесплатные токены</u> для сборок.
         </SectionDescription>
         
         <ContactContainer>
@@ -249,6 +270,16 @@ const Contact = () => {
                 </InputWrapper>
                 <InputWrapper>
                   <Input
+                    type="email"
+                    name="email"
+                    placeholder="Email*"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </InputWrapper>
+                <InputWrapper>
+                  <Input
                     type="tel"
                     name="phone"
                     placeholder="+7 (___) __-__-___*"
@@ -257,14 +288,15 @@ const Contact = () => {
                     required
                   />
                 </InputWrapper>
-                <TextAreaWrapper>
-                  <TextArea
-                    name="message"
-                    placeholder="Оставьте свой вопрос здесь"
-                    value={formData.message}
+                <InputWrapper>
+                  <Input
+                    type="text"
+                    name="company"
+                    placeholder="Название компании (необязательно)"
+                    value={formData.company}
                     onChange={handleChange}
                   />
-                </TextAreaWrapper>
+                </InputWrapper>
               </FormInputs>
               
               <CheckboxContainer>
@@ -277,11 +309,13 @@ const Contact = () => {
                   required
                 />
                 <CheckboxLabel htmlFor="agreement">
-                  Я принимаю политику обработки персональных данных
+                  Я принимаю политику обработки персональных данных и согласен получать информацию о продукте
                 </CheckboxLabel>
               </CheckboxContainer>
               
-              <FormSubmitButton type="submit">Перезвоните мне</FormSubmitButton>
+              <FormSubmitButton type="submit" disabled={isSubmitting}>
+                {isSubmitting ? 'Отправляем...' : 'Оставить заявку'}
+              </FormSubmitButton>
             </form>
           </ContactForm>
           
@@ -292,6 +326,11 @@ const Contact = () => {
           </ContactImageWrapper>
         </ContactContainer>
       </Container>
+      
+      <SuccessModal 
+        isOpen={showModal} 
+        onClose={() => setShowModal(false)} 
+      />
     </ContactSection>
   );
 };
