@@ -1,52 +1,53 @@
-# ZEN.PIPELINE Landing Page
+# Deployment Scripts
 
-## Overview
-This landing page serves as a placeholder for our main application while we develop the full-featured platform. It's designed to capture leads (email and phone) and redirect interested users to our Telegram bot for updates and information.
+## Active Scripts
 
-## Project Structure
-```
-landing/
-├── docs/                    # Documentation files
-├── public/                  # Static assets
-└── src/                     # React source code
-    ├── assets/              # Images, fonts, and other static files
-    ├── components/          # Reusable React components
-    ├── hooks/               # Custom React hooks
-    ├── styles/              # CSS and style-related files
-    └── utils/               # Utility functions
-```
+### `deploy-to-server.sh` ✅
+**Status:** ACTIVE - Main deployment script for landing page  
+**Usage:** `./scripts/deploy-to-server.sh`  
+**Target:** 95.163.220.11 (current VPS server)  
+**Features:**
+- Optimized file copying (excludes node_modules, build artifacts)
+- Uses .gitignore patterns
+- Password-based SSH authentication
+- Automatic container management
+- Health checks
 
-## Getting Started
+**Last Updated:** July 29, 2025
 
-### Prerequisites
-- Node.js (v18+)
-- npm or yarn
+### `../landing-page/deploy.sh` ⚠️
+**Status:** RESERVE - Local deployment script  
+**Usage:** `cd landing-page && ./deploy.sh [dev|prod|ssl]`  
+**Target:** Local development or future domain-based deployment  
+**Features:**
+- Local Docker Compose deployment
+- Development, production and SSL modes
+- Let's Encrypt integration
+- Well-structured argument parsing
 
-### Installation
-1. Clone the repository
-2. Navigate to the landing directory
-3. Install dependencies:
+**Note:** Not used for current VPS deployment, but useful for local development
+
+## Current Infrastructure
+
+- **Server IP:** 95.163.220.11
+- **Authentication:** Password-based SSH (root user)
+- **Services:** PostgreSQL + Node.js Backend + Nginx Frontend
+- **Deployment:** Docker Compose based
+- **Configuration:** HTTP only (no SSL currently)
+
+## Quick Commands
+
 ```bash
-npm install
-# or
-yarn install
-```
+# Deploy landing page
+./scripts/deploy-to-server.sh
 
-### Development
-Start the development server:
-```bash
-npm start
-# or
-yarn start
-```
+# Check server status
+sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'cd /opt/zen-landing && docker-compose ps'
 
-### Build for Production
-Create an optimized production build:
-```bash
-npm run build
-# or
-yarn build
-```
+# View logs
+sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'cd /opt/zen-landing && docker-compose logs -f'
 
-## Deployment
-The landing page is deployed on a Yandex VM with a static IP. See the [Infrastructure Plan](./docs/INFRASTRUCTURE.md) for more details. 
+# Test endpoints
+curl http://95.163.220.11/
+curl http://95.163.220.11/api/health
+``` 

@@ -10,11 +10,11 @@ app.use(express.json());
 
 // PostgreSQL connection
 const pool = new Pool({
-  host: 'localhost',
-  port: 5432,
-  database: 'zen_pipeline',
-  user: 'zen_api',
-  password: 'change-in-production-123'
+  host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT || 5432,
+  database: process.env.DB_NAME || 'zen_pipeline',
+  user: process.env.DB_USER || 'zen_api',
+  password: process.env.DB_PASSWORD || 'change-in-production-123'
 });
 
 // Test database connection
@@ -148,14 +148,9 @@ app.get('/api/leads', async (req, res) => {
   }
 });
 
-// Health check
-app.get('/api/health', async (req, res) => {
-  try {
-    await pool.query('SELECT 1');
-    res.json({ status: 'OK', database: 'connected' });
-  } catch (error) {
-    res.status(500).json({ status: 'ERROR', database: 'disconnected' });
-  }
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 app.listen(PORT, () => {

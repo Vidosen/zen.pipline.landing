@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: zen-landing-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-zen_pipeline}
+      POSTGRES_USER: ${DB_USER:-zen_api}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-zen_dev_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5433:5432"  # Use 5433 to avoid conflicts with local PostgreSQL
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-zen_api} -d ${DB_NAME:-zen_pipeline}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zen-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: zen-landing-backend
+    environment:
+      - NODE_ENV=development
+      - PORT=${PORT:-3001}
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-zen_pipeline}
+      - DB_USER=${DB_USER:-zen_api}
+      - DB_PASSWORD=${DB_PASSWORD:-zen_dev_password}
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - zen-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: zen-landing-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - zen-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  zen-network:
+    driver: bridge 
