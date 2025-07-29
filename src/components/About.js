@@ -6,6 +6,57 @@ const AboutSection = styled(Section)`
   position: relative;
 `;
 
+const TextsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  width: 100%;
+  
+  @media (max-width: 768px) {
+    gap: 20px;
+  }
+`;
+
+const HeadingsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+`;
+
+const StyledDescriptionContainer = styled.div`
+  background-color: rgba(25, 16, 52, 0.1);
+  position: relative;
+  border-radius: 20px;
+  padding: 20px;
+  backdrop-filter: blur(30px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(to bottom right, #837BD0, #4E4988, #19163F, #19163F, #4E4988, #837BD0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+`;
+
+const StyledSectionDescription = styled(SectionDescription)`
+  color: #F6F5FF;
+  margin: 0;
+`;
+
 const FeaturesGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -111,6 +162,10 @@ const FeatureTitle = styled.h3`
   max-width: 243px;
   margin: 0 auto;
   white-space: pre-line;
+  
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
 `;
 
 const About = () => {
@@ -140,18 +195,24 @@ const About = () => {
   return (
     <AboutSection id="about">
       <Container>
-        <SectionSubtitle>
-          <div className="badge">
-            <span>О сервисе</span>
-          </div>
-          <div className="shadow"></div>
-        </SectionSubtitle>
-        
-        <SectionTitle>Мы позаботимся о сборках</SectionTitle>
-        
-        <SectionDescription>
-          Zen Pipeline предоставляет автоматизированные сервисы для сборки iOS и macOS приложений, созданных специально для российских разработчиков.
-        </SectionDescription>
+        <TextsContainer>
+          <HeadingsContainer>
+            <SectionSubtitle>
+              <div className="badge">
+                <span>О сервисе</span>
+              </div>
+              <div className="shadow"></div>
+            </SectionSubtitle>
+            
+            <SectionTitle>Мы позаботимся о сборках</SectionTitle>
+          </HeadingsContainer>
+          
+          <StyledDescriptionContainer>
+            <StyledSectionDescription>
+              Zen Pipeline предоставляет автоматизированные сервисы для сборки iOS и macOS приложений, созданных специально для российских разработчиков.
+            </StyledSectionDescription>
+          </StyledDescriptionContainer>
+        </TextsContainer>
         
         <FeaturesGrid>
           {features.map(feature => (

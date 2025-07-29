@@ -10,7 +10,7 @@ const HeroSection = styled.section`
   position: relative;
   overflow: visible;
   background-color: transparent;
-  min-height: 80vh;
+  min-height: 70vh;
   width: 100%;
 `;
 

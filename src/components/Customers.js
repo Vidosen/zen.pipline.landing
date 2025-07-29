@@ -14,6 +14,11 @@ const TextsContainer = styled.div`
   flex-direction: column;
   gap: 50px;
   width: 100%;
+  
+  @media (max-width: 768px) {
+    gap: 20px;
+    margin-bottom: 80px;
+  }
 `;
 
 const HeadingsContainer = styled.div`
@@ -31,9 +36,12 @@ const CustomerCardsContainer = styled.div`
   display: flex;
   width: 100%;
   gap: 80px;
+  padding: 0 20px;
   
   @media (max-width: 768px) {
     flex-direction: column;
+    gap: 80px;
+    padding: 0 20px;
   }
 `;
 
@@ -54,6 +62,11 @@ const VerticalContainer = styled.div`
   
   @media (max-width: 768px) {
     padding-top: 0;
+    gap: 80px;
+    
+    &:nth-child(2) {
+      padding-top: 0;
+    }
   }
 `;
 
@@ -64,10 +77,6 @@ const CustomerCard = styled.div`
   gap: 20px;
   width: 100%;
   height: 422px;
-  
-  @media (max-width: 768px) {
-    margin-bottom: 40px;
-  }
 `;
 
 const CardImageContainer = styled.div`
@@ -145,6 +154,10 @@ const CardDescription = styled.p`
   line-height: 1.3;
   color: white;
   margin: 0;
+  
+  @media (max-width: 768px) {
+    font-size: 22px;
+  }
 `;
 
 const Customers = () => {

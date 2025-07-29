@@ -83,6 +83,12 @@ const MacImage = styled.div`
     height: 100%;
     object-fit: cover;
   }
+
+  @media (max-width: 768px) {
+    top: -100px;
+    right: -350px;
+    width: 1000px;
+  }
   
 
   transition: transform 1s ease-out;
@@ -93,10 +99,10 @@ const MacImage = styled.div`
 // Additional decorative element in the top right
 const HeroDecorativeElement = styled.div`
   position: absolute;
-  top: -74px;
-  left: 35%;
-  width: 250px;
-  height: 250px;
+  top: -250px;
+  right: -100px;
+  width: 600px;
+  height: 600px;
   z-index: 2;
   
   img {
@@ -109,22 +115,21 @@ const HeroDecorativeElement = styled.div`
     display: none;
   }
   
-  transition: transform 1.3s ease-out, opacity 1s ease-in-out;
-  transform: ${props => props.isVisible ? 'translateY(0) rotate(0deg)' : 'translateY(-40px) rotate(-10deg)'};
-  opacity: ${props => props.isVisible ? '1' : '0'};
+  transition: transform 1.2s ease-out, opacity 1s ease-in-out;
+  transform: ${props => props.isVisible ? 'scale(1)' : 'scale(0.8)'};
+  opacity: ${props => props.isVisible ? '0.8' : '0'};
 `;
 
-// The spiral image
+// Gradient element on the right
 const HeroGradientElement = styled.div`
   position: absolute;
-  top: 395px;
-  left: 20%;
-  width: 500px;
-  height: 500px;
-  z-index: 4;
+  top: 50px;
+  right: -50px;
+  width: 400px;
+  height: 400px;
+  z-index: 2;
   
   img {
-    position: relative;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -134,38 +139,87 @@ const HeroGradientElement = styled.div`
     display: none;
   }
   
-  transition: transform 1.5s ease-out, opacity 1.3s ease-in-out;
-  transform: ${props => props.isVisible ? 'translateY(0) rotate(0deg)' : 'translateY(70px) rotate(10deg)'};
+  transition: transform 1.2s ease-out, opacity 1s ease-in-out;
+  transform: ${props => props.isVisible ? 'rotate(0deg)' : 'rotate(15deg)'};
+  opacity: ${props => props.isVisible ? '0.6' : '0'};
+`;
+
+// Mobile-only Frame 112 decoration from Figma
+const MobileFrame112 = styled.div`
+  position: absolute;
+  top: 350px;
+  left: -120px;
+  width: 310px;
+  height: 343px;
+  z-index: 4;
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: block;
+  }
+  
+  transition: transform 1.2s ease-out, opacity 1s ease-in-out;
+  transform: ${props => props.isVisible ? 'translateY(0)' : 'translateY(50px)'};
   opacity: ${props => props.isVisible ? '1' : '0'};
 `;
 
-// New component for Contact section decorations
-const ContactImageContainer = styled.div`
+// Blurred ellipse element within Frame 112
+const Frame112Ellipse = styled.div`
+  position: absolute;
+  top: 287px;
+  left: 112px;
+  width: 188px;
+  height: 66px;
+  background-color: #797E81;
+  border-radius: 50%;
+  filter: blur(50px);
+  z-index: 1;
+`;
+
+// Image element within Frame 112
+const Frame112Image = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  border-radius: 0;
-  transition: opacity 0.8s ease-in-out, transform 1s ease-out;
-  opacity: ${props => props.isVisible ? '1' : '0'};
-  transform: ${props => props.isVisible ? 'translateX(0)' : 'translateX(50px)'};
+  width: 310px;
+  height: 310px;
+  z-index: 2;
   
   img {
     width: 100%;
-    height: auto;
+    height: 100%;
     object-fit: cover;
-    object-position: center;
-    min-height: 100%;
-  }
-  
-  @media (max-width: 1024px) {
-    display: none;
+    filter: blur(10px);
   }
 `;
 
-const HeroBackgroundDecorations = ({ sectionId = "home" }) => {
+// Contact section decorations
+const ContactImageContainer = styled.div`
+  position: absolute;
+  top: 20px;
+  right: -150px;
+  width: 400px;
+  height: 600px;
+  z-index: 1;
+  border-radius: 20px;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
+  
+  transition: transform 1.2s ease-out, opacity 1s ease-in-out;
+  transform: ${props => props.isVisible ? 'translateX(0)' : 'translateX(100px)'};
+  opacity: ${props => props.isVisible ? '0.8' : '0'};
+`;
+
+const HeroBackgroundDecorations = ({ sectionId = 'hero' }) => {
   const [isVisible, setIsVisible] = useState(true); // Start visible by default
   
   // Scroll-based visibility
@@ -217,6 +271,13 @@ const HeroBackgroundDecorations = ({ sectionId = "home" }) => {
       <HeroGradientElement isVisible={isVisible}>
         <img src="/images/hero-element.png" alt="Gradient element" />
       </HeroGradientElement>
+      
+      <MobileFrame112 isVisible={isVisible}>
+        <Frame112Ellipse />
+        <Frame112Image>
+          <img src="/images/frame-112-decoration.png" alt="Frame 112 decoration" />
+        </Frame112Image>
+      </MobileFrame112>
     </DecorationsContainer>
   );
 };
