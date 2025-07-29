@@ -41,7 +41,7 @@ const FormInputs = styled.div`
   margin-bottom: 30px;
 `;
 
-// Base input wrapper with gradient border - new implementation
+// Enhanced input wrapper with floating label
 const InputWrapper = styled.div`
   position: relative;
   width: 100%;
@@ -68,35 +68,93 @@ const InputWrapper = styled.div`
   }
 `;
 
-// Base input styling
+// Floating label component
+const FloatingLabel = styled.label`
+  position: absolute;
+  left: 30px;
+  top: ${props => props.isFloating ? '8px' : '50%'};
+  transform: translateY(${props => props.isFloating ? '0' : '-50%'});
+  font-family: 'Gilroy', sans-serif;
+  font-weight: 300;
+  font-size: ${props => props.isFloating ? '12px' : '17px'};
+  color: ${props => props.isFloating ? '#CAC3C3' : '#E8E6E6'};
+  opacity: ${props => props.isFloating ? '1' : '0.7'};
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: ${props => props.isFloating ? '3' : '1'};
+`;
+
+// Enhanced input without placeholder
 const Input = styled.input`
   width: 100%;
   height: 100%;
   background: transparent;
   border: none;
   border-radius: 100px;
-  padding: 20px 30px;
+  padding: ${props => props.hasFloatingLabel ? '25px 30px 15px 30px' : '20px 30px'};
   font-family: 'Gilroy', sans-serif;
   font-weight: 300;
   font-size: 17px;
   color: #F6F5FF;
   
-  &::placeholder {
-    color: #E8E6E6;
-    opacity: 0.7;
-    transition: all 0.3s ease;
+  &:focus {
+    outline: none;
   }
+  
+  &::placeholder {
+    color: transparent;
+  }
+`;
+
+// Phone mask display background
+const PhoneMaskBackground = styled.div`
+  position: absolute;
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Gilroy', sans-serif;
+  font-weight: 300;
+  font-size: 17px;
+  color: #666;
+  opacity: 1;
+  pointer-events: none;
+  z-index: 1;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  margin-top: 5px; /* Adjust for the input's top padding difference */
+  letter-spacing: 0.5px; /* Increase horizontal spacing between characters */
+`;
+
+// Phone input with interactive mask
+const PhoneInput = styled.input`
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  border-radius: 100px;
+  padding: 25px 30px 15px 30px;
+  font-family: 'Gilroy', sans-serif;
+  font-weight: 300;
+  font-size: 17px;
+  color: #F6F5FF;
+  position: relative;
+  z-index: 2;
+  line-height: 1;
   
   &:focus {
     outline: none;
   }
   
-  /* Focus state styling */
-  &:focus::placeholder {
-    font-size: 12px;
-    transform: translateY(-8px);
-    color: #CAC3C3;
-    opacity: 1;
+  &::placeholder {
+    color: transparent;
+  }
+  
+  /* Ensure this input overrides any inherited styles */
+  &[type="tel"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
   }
 `;
 
@@ -159,11 +217,155 @@ const ContactDecorationWrapper = styled.div`
   }
 `;
 
+// Enhanced Input Component with floating label
+const EnhancedInput = ({ label, type, name, value, onChange, required = false }) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const isFloating = isFocused || value.length > 0;
+
+  return (
+    <InputWrapper>
+      <FloatingLabel isFloating={isFloating}>
+        {label}{required && '*'}
+      </FloatingLabel>
+      <Input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        hasFloatingLabel={true}
+        required={required}
+      />
+    </InputWrapper>
+  );
+};
+
+// Enhanced Phone Input with interactive formatting
+const EnhancedPhoneInput = ({ label, name, value, onChange, required = false }) => {
+  const [isFocused, setIsFocused] = useState(false);
+
+  // Initialize with +7 if empty
+  React.useEffect(() => {
+    if (value === '') {
+      onChange({
+        target: {
+          name,
+          value: '+7'
+        }
+      });
+    }
+  }, []);
+
+  const formatPhoneNumber = (phoneNumber) => {
+    // Remove all non-digits
+    const cleaned = phoneNumber.replace(/\D/g, '');
+    
+    // Handle Russian phone number format
+    if (cleaned.length === 0) return '+7';
+    if (cleaned.length === 1) return '+7';
+    
+    // Start with +7
+    let formatted = '+7';
+    
+    // Add area code in parentheses (digits 1-3)
+    if (cleaned.length > 1) {
+      const areaCode = cleaned.slice(1, 4);
+      formatted += ` (${areaCode}`;
+      
+      // Close parenthesis only when we have 3+ area code digits or moving to next section
+      if (cleaned.length >= 4) {
+        formatted += ')';
+        
+        // Add first part of number (digits 4-6)
+        if (cleaned.length > 4) {
+          const part1 = cleaned.slice(4, 7);
+          formatted += ` ${part1}`;
+          
+          // Add second part (digits 7-8)
+          if (cleaned.length > 7) {
+            const part2 = cleaned.slice(7, 9);
+            formatted += `-${part2}`;
+            
+            // Add third part (digits 9-10)
+            if (cleaned.length > 9) {
+              const part3 = cleaned.slice(9, 11);
+              formatted += `-${part3}`;
+            }
+          }
+        }
+      }
+    }
+    
+    return formatted;
+  };
+
+  const getBackgroundMask = () => {
+    // Always return the same static mask
+    return '+7 (___) ___-__-__';
+  };
+
+  const handlePhoneChange = (e) => {
+    let input = e.target.value;
+    
+    // If user tries to delete the +7 part, keep at least +7
+    if (!input.startsWith('+7') || input.length < 2) {
+      // Extract just the digits
+      const digits = input.replace(/\D/g, '');
+      input = digits;
+    }
+    
+    const formatted = formatPhoneNumber(input);
+    onChange({
+      target: {
+        name,
+        value: formatted
+      }
+    });
+  };
+
+  const handleKeyDown = (e) => {
+    // Prevent deleting +7 prefix
+    if ((e.key === 'Backspace' || e.key === 'Delete') && value.length <= 2) {
+      e.preventDefault();
+    }
+  };
+
+  const handleFocus = () => {
+    setIsFocused(true);
+    // Ensure +7 is present when focusing
+    if (value === '' || value === '+7') {
+      onChange({
+        target: {
+          name,
+          value: '+7'
+        }
+      });
+    }
+  };
+
+  return (
+    <InputWrapper>
+      <PhoneMaskBackground>{getBackgroundMask()}</PhoneMaskBackground>
+      <PhoneInput
+        type="tel"
+        name={name}
+        value={value}
+        onChange={handlePhoneChange}
+        onKeyDown={handleKeyDown}
+        onFocus={handleFocus}
+        onBlur={() => setIsFocused(false)}
+        required={required}
+      />
+    </InputWrapper>
+  );
+};
+
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
+    phone: '+7',
     company: '',
     agreement: false
   });
@@ -202,101 +404,74 @@ const Contact = () => {
       });
       
       if (response.ok) {
-        const result = await response.json();
-        
-        // Очищаем форму
+        setShowModal(true);
         setFormData({
           name: '',
           email: '',
-          phone: '',
+          phone: '+7',
           company: '',
           agreement: false
         });
-        
-        // Показываем модальное окно
-        setShowModal(true);
-        
-        // Top.Mail.Ru событие конверсии
-        if (window._tmr) {
-          window._tmr.push({
-            type: 'reachGoal',
-            id: 3659683,
-            goal: 'lead_submitted'
-          });
-        }
-        
-        console.log('Lead submitted successfully:', result);
       } else {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Ошибка сервера');
+        console.error('Ошибка при отправке формы');
       }
     } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Произошла ошибка при отправке заявки. Попробуйте еще раз или напишите нам напрямую.');
+      console.error('Ошибка сети:', error);
     } finally {
       setIsSubmitting(false);
     }
   };
-  
+
   return (
     <ContactSection id="contact">
       <Container>
         <SectionSubtitle>
           <div className="badge">
-            <span>Станьте частью beta-тестирования</span>
+            <span>Связаться с нами</span>
           </div>
           <div className="shadow"></div>
         </SectionSubtitle>
         
-        <SectionTitle>Получите ранний доступ к платформе</SectionTitle>
+        <SectionTitle>Оставить заявку</SectionTitle>
         
         <SectionDescription>
-          Зарегистрируйтесь сейчас и получите приоритетный доступ к платформе облачных сборок iOS и macOS. Первые 100 пользователей получат <u>бесплатные токены</u> для сборок.
+          Готовы автоматизировать свои сборки? Оставьте заявку, и мы свяжемся с вами в течение 24 часов для обсуждения деталей интеграции и настройки вашего проекта.
         </SectionDescription>
         
         <ContactContainer>
           <ContactForm>
             <form onSubmit={handleSubmit}>
               <FormInputs>
-                <InputWrapper>
-                  <Input
-                    type="text"
-                    name="name"
-                    placeholder="Ваше имя*"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                  />
-                </InputWrapper>
-                <InputWrapper>
-                  <Input
-                    type="email"
-                    name="email"
-                    placeholder="Email*"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </InputWrapper>
-                <InputWrapper>
-                  <Input
-                    type="tel"
-                    name="phone"
-                    placeholder="+7 (___) __-__-___*"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    required
-                  />
-                </InputWrapper>
-                <InputWrapper>
-                  <Input
-                    type="text"
-                    name="company"
-                    placeholder="Название компании (необязательно)"
-                    value={formData.company}
-                    onChange={handleChange}
-                  />
-                </InputWrapper>
+                <EnhancedInput
+                  label="Ваше имя"
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+                <EnhancedInput
+                  label="Email"
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+                <EnhancedPhoneInput
+                  label="+7 (___) __-__-___"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  required
+                />
+                <EnhancedInput
+                  label="Название компании (необязательно)"
+                  type="text"
+                  name="company"
+                  value={formData.company}
+                  onChange={handleChange}
+                />
               </FormInputs>
               
               <CheckboxContainer>
@@ -335,4 +510,4 @@ const Contact = () => {
   );
 };
 
-export default Contact; 
+export default Contact;

@@ -10,7 +10,7 @@ const DecorationsContainer = styled.div`
   height: 100%;
   pointer-events: none;
   z-index: -1;
-  overflow: hidden;
+  overflow: visible;
   opacity: ${props => props.isVisible ? '1' : '0'};
   transition: opacity 0.8s ease-in-out;
 `;

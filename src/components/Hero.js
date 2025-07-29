@@ -8,7 +8,7 @@ const HeroSection = styled.section`
   padding: 120px 0 0;
   display: flex;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   background-color: transparent;
   min-height: 80vh;
   width: 100%;
@@ -20,7 +20,7 @@ const HeroContent = styled.div`
   gap: 40px;
   max-width: 768px;
   position: relative;
-  z-index: 10;
+  z-index: 20;
   
   @media (max-width: 768px) {
     max-width: 100%;
@@ -64,14 +64,13 @@ const ActionButtonWrapper = styled.div`
 const HeroDecorationWrapper = styled.div`
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
   width: 100%;
   height: 100%;
   pointer-events: none;
-  overflow: hidden;
-  z-index: 1;
+  overflow: visible;
+  z-index: 0;
   
   /* Ensure content in the wrapper doesn't affect the Hero section's height */
   & > * {
@@ -82,6 +81,11 @@ const HeroDecorationWrapper = styled.div`
 const Hero = () => {
   return (
     <HeroSection id="home">
+      {/* Move decorations outside Container to prevent clipping */}
+      <HeroDecorationWrapper>
+        <HeroBackgroundDecorations sectionId="home" />
+      </HeroDecorationWrapper>
+      
       <Container>
         <HeroContent>
           
@@ -104,11 +108,6 @@ const Hero = () => {
           </CallToAction>
         </HeroContent>
       </Container>
-      
-      {/* Move the decorations wrapper to be the last child */}
-      <HeroDecorationWrapper>
-        <HeroBackgroundDecorations sectionId="home" />
-      </HeroDecorationWrapper>
     </HeroSection>
   );
 };
