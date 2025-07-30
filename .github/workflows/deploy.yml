@@ -1,48 +1,111 @@
-name: Deploy Landing Page
+name: Landing Page CI/CD
 
 on:
   push:
+    branches: [ master, develop ]
+    paths:
+      - 'landing-page/**'
+      - '.github/workflows/deploy.yml'
+  pull_request:
     branches: [ master ]
     paths:
-      - 'landing/**'
-      - '.github/workflows/deploy.yml'
+      - 'landing-page/**'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME_FRONTEND: ${{ github.repository }}/landing-frontend
+  IMAGE_NAME_BACKEND: ${{ github.repository }}/landing-backend
 
 jobs:
-  build_and_deploy:
+  # Build and test stage - runs on every push/PR
+  build:
     runs-on: ubuntu-latest
-    
+    outputs:
+      frontend-image: ${{ steps.meta-frontend.outputs.tags }}
+      backend-image: ${{ steps.meta-backend.outputs.tags }}
+      
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
-        node-version: 18
+        node-version: '18'
         cache: 'npm'
-        cache-dependency-path: landing/package-lock.json
+        cache-dependency-path: landing-page/package-lock.json
 
     - name: Install dependencies
-      run: |
-        cd landing
-        npm ci
+      working-directory: landing-page
+      run: npm ci
 
-    - name: Build
-      run: |
-        cd landing
-        npm run build
+    - name: Run tests (if any)
+      working-directory: landing-page
+      run: npm test --if-present
 
-    - name: Install SSH key
-      uses: shimataro/ssh-key-action@v2
+    - name: Build frontend
+      working-directory: landing-page
+      run: npm run build
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
       with:
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
-        if_key_exists: replace
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Deploy to Yandex Cloud VM
+    - name: Extract metadata (tags, labels) for Frontend
+      id: meta-frontend
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Extract metadata (tags, labels) for Backend
+      id: meta-backend
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Build and push Frontend Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: landing-page
+        file: landing-page/Dockerfile.frontend
+        push: true
+        tags: ${{ steps.meta-frontend.outputs.tags }}
+        labels: ${{ steps.meta-frontend.outputs.labels }}
+
+    - name: Build and push Backend Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: landing-page
+        file: landing-page/Dockerfile.backend
+        push: true
+        tags: ${{ steps.meta-backend.outputs.tags }}
+        labels: ${{ steps.meta-backend.outputs.labels }}
+
+  # Staging deployment - automatic for develop branch
+  deploy-staging:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    
+    steps:
+    - name: Deploy to staging
       run: |
-        rsync -avz --delete landing/build/ ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ secrets.DEPLOY_PATH }}/
-      
-    - name: Restart Nginx (if needed)
-      run: |
-        ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} 'sudo systemctl reload nginx' 
+        echo "🚀 Deploying to staging environment"
+        echo "Frontend image: ${{ needs.build.outputs.frontend-image }}"
+        echo "Backend image: ${{ needs.build.outputs.backend-image }}"
+        # Add actual staging deployment logic here
+
+ 

@@ -257,25 +257,25 @@ const HeroBackgroundDecorations = ({ sectionId = 'hero' }) => {
       <DarkOverlay isVisible={isVisible} />
       <HeroEllipse isVisible={isVisible} />
       <BlurEffect isVisible={isVisible}>
-        <img src="/images/hero-blur-1.png" alt="Blur effect" />
+        <img src="/images/hero-blur-1.png" alt="Blur effect" loading="lazy" />
       </BlurEffect>
       
       <MacImage isVisible={isVisible}>
-        <img src="/images/hero-mac.png" alt="Mac mini device" />
+        <img src="/images/hero-mac.png" alt="Mac mini device" loading="lazy" />
       </MacImage>
       
       <HeroDecorativeElement isVisible={isVisible}>
-        <img src="/images/hero-gradient.png" alt="Decorative element" />
+        <img src="/images/hero-gradient.png" alt="Decorative element" loading="lazy" />
       </HeroDecorativeElement>
       
       <HeroGradientElement isVisible={isVisible}>
-        <img src="/images/hero-element.png" alt="Gradient element" />
+        <img src="/images/hero-element.png" alt="Gradient element" loading="lazy" />
       </HeroGradientElement>
       
       <MobileFrame112 isVisible={isVisible}>
         <Frame112Ellipse />
         <Frame112Image>
-          <img src="/images/frame-112-decoration.png" alt="Frame 112 decoration" />
+          <img src="/images/frame-112-decoration.png" alt="Frame 112 decoration" loading="lazy" />
         </Frame112Image>
       </MobileFrame112>
     </DecorationsContainer>
@@ -318,7 +318,7 @@ export const ContactDecorations = () => {
   
   return (
     <ContactImageContainer isVisible={isVisible}>
-      <img src="/images/contact-image.jpg" alt="Contact us" />
+      <img src="/images/contact-image.jpg" alt="Contact us" loading="lazy" />
     </ContactImageContainer>
   );
 };

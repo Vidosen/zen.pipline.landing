@@ -226,7 +226,7 @@ const Customers = () => {
             {customers.slice(0, 2).map((customer) => (
               <CustomerCard key={customer.id}>
                 <CardImageContainer>
-                  <CardImage src={customer.image} alt={customer.title} />
+                  <CardImage src={customer.image} alt={customer.title} loading="lazy" />
                   <CardOverlay />
                   <CardContent bottom={customer.contentBottom}>
                     <CardTitle maxWidth={customer.titleMaxWidth}>{customer.title}</CardTitle>
@@ -245,7 +245,7 @@ const Customers = () => {
             {customers.slice(2, 4).map((customer) => (
               <CustomerCard key={customer.id}>
                 <CardImageContainer>
-                  <CardImage src={customer.image} alt={customer.title} />
+                  <CardImage src={customer.image} alt={customer.title} loading="lazy" />
                   <CardOverlay />
                   <CardContent bottom={customer.contentBottom}>
                     <CardTitle maxWidth={customer.titleMaxWidth}>{customer.title}</CardTitle>
