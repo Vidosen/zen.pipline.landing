@@ -33,11 +33,11 @@ jobs:
       id: images
       run: |
         if [ "${{ github.event.inputs.image_tag }}" = "latest" ]; then
-          echo "frontend-image=ghcr.io/${{ github.repository }}/landing-frontend:latest" >> $GITHUB_OUTPUT
-          echo "backend-image=ghcr.io/${{ github.repository }}/landing-backend:latest" >> $GITHUB_OUTPUT
+          echo "frontend-image=ghcr.io/vidosen/zen.pipline.landing/landing-frontend:latest" >> $GITHUB_OUTPUT
+          echo "backend-image=ghcr.io/vidosen/zen.pipline.landing/landing-backend:latest" >> $GITHUB_OUTPUT
         else
-          echo "frontend-image=ghcr.io/${{ github.repository }}/landing-frontend:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
-          echo "backend-image=ghcr.io/${{ github.repository }}/landing-backend:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
+          echo "frontend-image=ghcr.io/vidosen/zen.pipline.landing/landing-frontend:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
+          echo "backend-image=ghcr.io/vidosen/zen.pipline.landing/landing-backend:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
         fi
 
     - name: Deploy to production server
