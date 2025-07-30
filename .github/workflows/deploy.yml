@@ -47,7 +47,12 @@ jobs:
       run: npm ci
 
     - name: Run tests (if any)
-      run: npm test --if-present --passWithNoTests --watchAll=false
+      run: |
+        if [ -d "src/__tests__" ] || find src -name "*.test.*" -o -name "*.spec.*" | grep -q .; then
+          npm test -- --passWithNoTests --watchAll=false
+        else
+          echo "No tests found, skipping test step"
+        fi
 
     - name: Build frontend
       run: npm run build
