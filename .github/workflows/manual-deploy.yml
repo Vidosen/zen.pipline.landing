@@ -52,6 +52,9 @@ jobs:
         echo "Frontend: $FRONTEND_IMAGE"
         echo "Backend: $BACKEND_IMAGE"
         
+        # Upload template file and execute production deployment
+        sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no docker-compose.prod.template.yml $DEPLOY_USER@$DEPLOY_HOST:/opt/zen-landing/
+        
         # Execute production deployment
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "
           cd /opt/zen-landing
