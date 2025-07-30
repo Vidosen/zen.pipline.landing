@@ -67,9 +67,7 @@ jobs:
           docker pull '$BACKEND_IMAGE'
           
           # Update docker-compose with new images
-          export FRONTEND_IMAGE='$FRONTEND_IMAGE'
-          export BACKEND_IMAGE='$BACKEND_IMAGE'
-          envsubst < docker-compose.prod.template.yml > docker-compose.prod.yml
+          sed \"s|\\\${BACKEND_IMAGE:-zen-landing-backend:latest}|$BACKEND_IMAGE|g; s|\\\${FRONTEND_IMAGE:-zen-landing-frontend:latest}|$FRONTEND_IMAGE|g\" docker-compose.prod.template.yml > docker-compose.prod.yml
           
           # Deploy with zero downtime (force recreate)
           docker-compose -f docker-compose.prod.yml up -d --force-recreate
