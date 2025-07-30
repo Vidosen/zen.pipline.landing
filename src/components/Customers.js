@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Container, Section, SectionTitle, SectionSubtitle, SectionDescription } from './common/utils';
+import WebPImage from './common/WebPImage';
 
 const CustomersSection = styled(Section)`
   position: relative;
@@ -87,10 +88,9 @@ const CardImageContainer = styled.div`
   overflow: hidden;
 `;
 
-const CardImage = styled.img`
+const CardImageWrapper = styled.div`
   width: 100%;
   height: 100%;
-  object-fit: cover;
 `;
 
 const CardOverlay = styled.div`
@@ -226,7 +226,9 @@ const Customers = () => {
             {customers.slice(0, 2).map((customer) => (
               <CustomerCard key={customer.id}>
                 <CardImageContainer>
-                  <CardImage src={customer.image} alt={customer.title} loading="lazy" />
+                  <CardImageWrapper>
+                    <WebPImage src={customer.image} alt={customer.title} loading="lazy" />
+                  </CardImageWrapper>
                   <CardOverlay />
                   <CardContent bottom={customer.contentBottom}>
                     <CardTitle maxWidth={customer.titleMaxWidth}>{customer.title}</CardTitle>
@@ -245,7 +247,9 @@ const Customers = () => {
             {customers.slice(2, 4).map((customer) => (
               <CustomerCard key={customer.id}>
                 <CardImageContainer>
-                  <CardImage src={customer.image} alt={customer.title} loading="lazy" />
+                  <CardImageWrapper>
+                    <WebPImage src={customer.image} alt={customer.title} loading="lazy" />
+                  </CardImageWrapper>
                   <CardOverlay />
                   <CardContent bottom={customer.contentBottom}>
                     <CardTitle maxWidth={customer.titleMaxWidth}>{customer.title}</CardTitle>

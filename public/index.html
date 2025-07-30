@@ -35,6 +35,82 @@
       font-display: swap;
     }
   </style>
+  
+  <!-- WebP поддержка и оптимизация -->
+  <script>
+    // Определение поддержки WebP
+    function supportsWebP() {
+      return new Promise((resolve) => {
+        const webP = new Image();
+        webP.onload = webP.onerror = () => {
+          resolve(webP.height === 2);
+        };
+        webP.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
+      });
+    }
+
+    // Добавляем класс для CSS
+    supportsWebP().then(supported => {
+      document.documentElement.classList.add(supported ? 'webp' : 'no-webp');
+    });
+
+    // Улучшенный lazy loading для изображений и picture элементов
+    function lazyLoadImages() {
+      const lazyImages = document.querySelectorAll('img[data-src]');
+      if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const img = entry.target;
+              
+              // Обрабатываем picture элемент если он есть
+              const picture = img.closest('picture');
+              if (picture) {
+                // Загружаем все source элементы
+                const sources = picture.querySelectorAll('source[data-srcset]');
+                sources.forEach(source => {
+                  source.srcset = source.dataset.srcset;
+                  source.removeAttribute('data-srcset');
+                });
+              }
+              
+              // Загружаем img элемент
+              if (img.dataset.src) {
+                img.src = img.dataset.src;
+                img.classList.add('loaded');
+                img.removeAttribute('data-src');
+              }
+              
+              imageObserver.unobserve(img);
+            }
+          });
+        }, {
+          rootMargin: '50px' // Загружаем изображения за 50px до появления в viewport
+        });
+        
+        lazyImages.forEach(img => imageObserver.observe(img));
+      } else {
+        // Fallback для старых браузеров
+        lazyImages.forEach(img => {
+          const picture = img.closest('picture');
+          if (picture) {
+            const sources = picture.querySelectorAll('source[data-srcset]');
+            sources.forEach(source => {
+              source.srcset = source.dataset.srcset;
+            });
+          }
+          
+          if (img.dataset.src) {
+            img.src = img.dataset.src;
+            img.classList.add('loaded');
+          }
+        });
+      }
+    }
+
+    // Запускаем после загрузки DOM
+    document.addEventListener('DOMContentLoaded', lazyLoadImages);
+  </script>
 </head>
 
 <body>
