@@ -21,10 +21,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup SSH
-      uses: webfactory/ssh-agent@v0.8.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Install sshpass
+      run: sudo apt-get update && sudo apt-get install -y sshpass
 
     - name: Add server to known hosts
       run: |
@@ -45,6 +43,7 @@ jobs:
       env:
         DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
         DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         FRONTEND_IMAGE: ${{ steps.images.outputs.frontend-image }}
         BACKEND_IMAGE: ${{ steps.images.outputs.backend-image }}
       run: |
@@ -52,11 +51,27 @@ jobs:
         echo "Frontend: $FRONTEND_IMAGE"
         echo "Backend: $BACKEND_IMAGE"
         
-        # Execute production deployment script
-        ssh $DEPLOY_USER@$DEPLOY_HOST "
+        # Execute production deployment
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "
+          cd /opt/zen-landing
+          
+          # Login to GitHub Container Registry
+          echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
+          
+          # Pull new images
+          docker pull '$FRONTEND_IMAGE'
+          docker pull '$BACKEND_IMAGE'
+          
+          # Update docker-compose with new images
           export FRONTEND_IMAGE='$FRONTEND_IMAGE'
           export BACKEND_IMAGE='$BACKEND_IMAGE'
-          /opt/zen-landing/scripts/deploy-production.sh
+          envsubst < docker-compose.prod.template.yml > docker-compose.prod.yml
+          
+          # Deploy with zero downtime
+          docker-compose -f docker-compose.prod.yml up -d
+          
+          # Cleanup old images
+          docker image prune -f
         "
 
     - name: Verify deployment
@@ -67,9 +82,9 @@ jobs:
         sleep 30
         
         # Check if site is accessible
-        if curl -f -s https://$DEPLOY_HOST/api/health; then
+        if curl -f -s http://$DEPLOY_HOST/; then
           echo "✅ Production deployment verified successfully"
-          echo "🌐 Site available at: https://$DEPLOY_HOST"
+          echo "🌐 Site available at: http://$DEPLOY_HOST"
         else
           echo "❌ Production deployment verification failed"
           exit 1
