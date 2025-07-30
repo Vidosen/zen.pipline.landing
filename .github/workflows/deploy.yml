@@ -103,6 +103,11 @@ jobs:
         push: true
         tags: ${{ steps.meta-backend.outputs.tags }}
         labels: ${{ steps.meta-backend.outputs.labels }}
+        build-args: |
+          GIT_COMMIT=${{ github.sha }}
+          GIT_BRANCH=${{ github.ref_name }}
+          BUILD_TIME=${{ github.run_id }}
+          APP_VERSION=${{ github.ref_name }}-${{ github.run_number }}
 
   # Staging deployment - automatic for develop branch
   deploy-staging:

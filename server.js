@@ -150,7 +150,16 @@ app.get('/api/leads', async (req, res) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.status(200).json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    version: {
+      commit: process.env.GIT_COMMIT || 'unknown',
+      branch: process.env.GIT_BRANCH || 'unknown',
+      buildTime: process.env.BUILD_TIME || 'unknown',
+      version: process.env.APP_VERSION || '1.0.0'
+    }
+  });
 });
 
 app.listen(PORT, () => {
