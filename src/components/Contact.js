@@ -242,8 +242,7 @@ const EnhancedInput = ({ label, type, name, value, onChange, required = false })
 };
 
 // Enhanced Phone Input with interactive formatting
-const EnhancedPhoneInput = ({ label, name, value, onChange, required = false }) => {
-  const [isFocused, setIsFocused] = useState(false);
+const EnhancedPhoneInput = ({ name, value, onChange, required = false }) => {
 
   // Initialize with +7 if empty
   React.useEffect(() => {
@@ -255,7 +254,7 @@ const EnhancedPhoneInput = ({ label, name, value, onChange, required = false }) 
         }
       });
     }
-  }, []);
+  }, [name, onChange, value]);
 
   const formatPhoneNumber = (phoneNumber) => {
     // Remove all non-digits
@@ -332,7 +331,6 @@ const EnhancedPhoneInput = ({ label, name, value, onChange, required = false }) 
   };
 
   const handleFocus = () => {
-    setIsFocused(true);
     // Ensure +7 is present when focusing
     if (value === '' || value === '+7') {
       onChange({
@@ -354,7 +352,7 @@ const EnhancedPhoneInput = ({ label, name, value, onChange, required = false }) 
         onChange={handlePhoneChange}
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
-        onBlur={() => setIsFocused(false)}
+        onBlur={() => {}}
         required={required}
       />
     </InputWrapper>
