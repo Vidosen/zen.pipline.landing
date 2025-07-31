@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Container, Section, SectionTitle, SectionSubtitle, SectionDescription } from './common/utils';
 import WebPImage from './common/WebPImage';
+import { CustomersDecorations } from './common/BackgroundDecorations';
 
 const CustomersSection = styled(Section)`
   position: relative;
@@ -265,6 +266,7 @@ const Customers = () => {
           </VerticalContainer>
         </CustomerCardsContainer>
       </Container>
+      <CustomersDecorations />
     </CustomersSection>
   );
 };

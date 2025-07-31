@@ -5,13 +5,17 @@ import ShinyButton from './Hero/ShinyButton';
 import HeroBackgroundDecorations from './common/BackgroundDecorations';
 
 const HeroSection = styled.section`
-  padding: 120px 0 0;
+  padding-top: 120px;
+  padding-bottom: 80px;
   display: flex;
   position: relative;
   overflow: visible;
   background-color: transparent;
-  min-height: 70vh;
   width: 100%;
+
+  @media (max-width: 768px) {
+    padding-bottom: 40px;
+  }
 `;
 
 const HeroContent = styled.div`
@@ -53,12 +57,23 @@ const CallToAction = styled.div`
   }
   
   @media (max-width: 768px) {
-    padding: 25px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 `;
 
 const ActionButtonWrapper = styled.div`
   margin-top: 40px;
+  
+  @media (max-width: 768px) {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
 `;
 
 const HeroDecorationWrapper = styled.div`
@@ -77,6 +92,8 @@ const HeroDecorationWrapper = styled.div`
     position: absolute;
   }
 `;
+
+
 
 const Hero = () => {
   return (

@@ -74,8 +74,8 @@ const BlurEffect = styled.div`
 const MacImage = styled.div`
   position: absolute;
   top: -28px;
-  right: -200px;
-  width: 800px;
+  right: -350px;
+  width: 1200px;
   height: auto;
   z-index: 3;
   
@@ -90,6 +90,12 @@ const MacImage = styled.div`
     right: -350px;
     width: 1000px;
   }
+
+  @media (max-width: 1400px) {
+    top: -28px;
+    right: -200px;
+    width: 800px;
+  }
   
 
   transition: transform 1s ease-out;
@@ -100,10 +106,10 @@ const MacImage = styled.div`
 // Additional decorative element in the top right
 const HeroDecorativeElement = styled.div`
   position: absolute;
-  top: -250px;
-  right: -100px;
-  width: 600px;
-  height: 600px;
+  top: -74px;
+  left: 35%;
+  width: 250px;
+  height: 250px;
   z-index: 2;
   
   img {
@@ -124,10 +130,10 @@ const HeroDecorativeElement = styled.div`
 // Gradient element on the right
 const HeroGradientElement = styled.div`
   position: absolute;
-  top: 50px;
-  right: -50px;
-  width: 400px;
-  height: 400px;
+  top: 395px;
+  left: 15%;
+  width: 500px;
+  height: 500px;
   z-index: 2;
   
   img {
@@ -194,21 +200,21 @@ const Frame112Image = styled.div`
   }
 `;
 
-// Contact section decorations
+// Contact section decorations - using contact-image
 const ContactImageContainer = styled.div`
   position: absolute;
-  top: 20px;
-  right: -150px;
-  width: 400px;
-  height: 600px;
-  z-index: 1;
-  border-radius: 20px;
-  overflow: hidden;
+  top: -50%;
+  right: -120%;
+  width: 1274px;
+  height: 1274px;
+  z-index: -1;
+  pointer-events: none;
   
   img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    border-radius: 20px;
   }
   
   @media (max-width: 768px) {
@@ -217,7 +223,7 @@ const ContactImageContainer = styled.div`
   
   transition: transform 1.2s ease-out, opacity 1s ease-in-out;
   transform: ${props => props.isVisible ? 'translateX(0)' : 'translateX(100px)'};
-  opacity: ${props => props.isVisible ? '0.8' : '0'};
+  opacity: ${props => props.isVisible ? '0.7' : '0'};
 `;
 
 const HeroBackgroundDecorations = ({ sectionId = 'hero' }) => {
@@ -258,25 +264,25 @@ const HeroBackgroundDecorations = ({ sectionId = 'hero' }) => {
       <DarkOverlay isVisible={isVisible} />
       <HeroEllipse isVisible={isVisible} />
       <BlurEffect isVisible={isVisible}>
-        <WebPImage src="/images/hero-blur-1.png" alt="Blur effect" loading="lazy" />
+        <WebPImage src="/images/hero-blur-1.png" alt="Blur effect" loading="eager" />
       </BlurEffect>
       
       <MacImage isVisible={isVisible}>
-        <WebPImage src="/images/hero-mac.png" alt="Mac mini device" loading="lazy" />
+        <WebPImage src="/images/hero-mac.png" alt="Mac mini device" loading="eager" />
       </MacImage>
       
       <HeroDecorativeElement isVisible={isVisible}>
-        <WebPImage src="/images/hero-gradient.png" alt="Decorative element" loading="lazy" />
+        <WebPImage src="/images/hero-gradient.png" alt="Decorative element" loading="eager" />
       </HeroDecorativeElement>
       
       <HeroGradientElement isVisible={isVisible}>
-        <WebPImage src="/images/hero-element.png" alt="Gradient element" loading="lazy" />
+        <WebPImage src="/images/hero-element.png" alt="Gradient element" loading="eager" />
       </HeroGradientElement>
       
-      <MobileFrame112 isVisible={isVisible}>
+            <MobileFrame112 isVisible={isVisible}>
         <Frame112Ellipse />
         <Frame112Image>
-          <WebPImage src="/images/frame-112-decoration.png" alt="Frame 112 decoration" loading="lazy" />
+          <WebPImage src="/images/frame-112-decoration.png" alt="Frame 112 decoration" loading="eager" />
         </Frame112Image>
       </MobileFrame112>
     </DecorationsContainer>
@@ -319,8 +325,76 @@ export const ContactDecorations = () => {
   
   return (
     <ContactImageContainer isVisible={isVisible}>
-      <WebPImage src="/images/contact-image.jpg" alt="Contact us" loading="lazy" />
+      <WebPImage src="/images/contact-image.webp" alt="Contact decoration" loading="lazy" />
     </ContactImageContainer>
+  );
+};
+
+// Global desktop decoration from Figma - appears on all pages
+// Desktop decoration for Customers section
+const CustomersDesktopDecoration = styled.div`
+  position: absolute;
+  top: -100px;
+  right: -200px;
+  width: 640px;
+  height: 640px;
+  z-index: 1;
+  pointer-events: none;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  @media (max-width: 1280px) {
+    display: none;
+  }
+  
+  transition: transform 1.2s ease-out, opacity 1s ease-in-out;
+  transform: ${props => props.isVisible ? 'translateY(0) rotate(0deg)' : 'translateY(50px) rotate(-10deg)'};
+  opacity: ${props => props.isVisible ? '0.4' : '0'};
+`;
+
+// Customers section decorations component
+export const CustomersDecorations = () => {
+  const [isVisible, setIsVisible] = useState(true);
+  
+  useEffect(() => {
+    const checkScroll = () => {
+      // Get the customers section element
+      const customersSection = document.getElementById('customers');
+      if (!customersSection) return;
+      
+      // Calculate visibility based on scroll position
+      const rect = customersSection.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      // Show when customers section is in viewport
+      if (rect.bottom > -300 && rect.top < windowHeight + 300) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+    
+    window.addEventListener('scroll', checkScroll);
+    checkScroll();
+    
+    return () => window.removeEventListener('scroll', checkScroll);
+  }, []);
+  
+  return (
+    <CustomersDesktopDecoration isVisible={isVisible}>
+      <img 
+        src="/images/desktop-decoration.webp" 
+        alt="Desktop decoration" 
+        onError={(e) => {
+          console.log('WebP failed, trying PNG fallback');
+          e.target.src = '/images/desktop-decoration.png';
+        }}
+      />
+    </CustomersDesktopDecoration>
   );
 };
 

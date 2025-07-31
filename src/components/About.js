@@ -25,36 +25,49 @@ const HeadingsContainer = styled.div`
 `;
 
 const StyledDescriptionContainer = styled.div`
-  background-color: rgba(25, 16, 52, 0.1);
-  position: relative;
-  border-radius: 20px;
-  padding: 20px;
-  backdrop-filter: blur(30px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
+  display: none;
   
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+  @media (max-width: 768px) {
+    background-color: rgba(25, 16, 52, 0.1);
+    position: relative;
     border-radius: 20px;
-    padding: 1px;
-    background: linear-gradient(to bottom right, #837BD0, #4E4988, #19163F, #19163F, #4E4988, #837BD0);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
+    padding: 20px;
+    backdrop-filter: blur(30px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 20px;
+      padding: 1px;
+      background: linear-gradient(to bottom right, #837BD0, #4E4988, #19163F, #19163F, #4E4988, #837BD0);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
   }
 `;
 
 const StyledSectionDescription = styled(SectionDescription)`
   color: #F6F5FF;
   margin: 0;
+`;
+
+const DesktopDescription = styled(SectionDescription)`
+  color: #F6F5FF;
+  margin: 0;
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const FeaturesGrid = styled.div`
@@ -206,6 +219,10 @@ const About = () => {
             
             <SectionTitle>Мы позаботимся о сборках</SectionTitle>
           </HeadingsContainer>
+          
+          <DesktopDescription>
+            Zen Pipeline предоставляет автоматизированные сервисы для сборки iOS и macOS приложений, созданных специально для российских разработчиков.
+          </DesktopDescription>
           
           <StyledDescriptionContainer>
             <StyledSectionDescription>

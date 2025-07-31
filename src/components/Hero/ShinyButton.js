@@ -77,6 +77,18 @@ const ShinyButton = styled(Link)`
       animation: none;
     }
   }
+  
+  @media (max-width: 768px) {
+    width: 240px;
+    height: 40px;
+    padding: 10px 20px;
+    font-size: 16px;
+    
+    &::after {
+      height: 20px;
+      border-radius: 0 0 30px 30px;
+    }
+  }
 `;
 
 export default ShinyButton; 

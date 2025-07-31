@@ -7,7 +7,7 @@ import SuccessModal from './SuccessModal';
 const ContactSection = styled.section`
   padding: 120px 0;
   position: relative;
-  
+  overflow: hidden;
   @media (max-width: 768px) {
     padding: 80px 0;
   }
@@ -21,11 +21,6 @@ const ContactContainer = styled.div`
   
   @media (max-width: 1200px) {
     gap: 100px;
-  }
-  
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    gap: 60px;
   }
 `;
 
@@ -189,8 +184,7 @@ const CheckboxLabel = styled.label`
 const ContactImageWrapper = styled.div`
   flex: 1;
   position: relative;
-  
-  @media (max-width: 1024px) {
+  @media (max-width: 1200px) {
     display: none;
   }
 `;
@@ -211,10 +205,7 @@ const ContactDecorationWrapper = styled.div`
   & > * {
     position: absolute;
   }
-  
-  @media (max-width: 1024px) {
-    display: none;
-  }
+
 `;
 
 // Enhanced Input Component with floating label
@@ -425,15 +416,15 @@ const Contact = () => {
       <Container>
         <SectionSubtitle>
           <div className="badge">
-            <span>Связаться с нами</span>
+            <span>Станьте частью beta-тестирования</span>
           </div>
           <div className="shadow"></div>
         </SectionSubtitle>
         
-        <SectionTitle>Оставить заявку</SectionTitle>
+        <SectionTitle>Получите ранний доступ к платформе</SectionTitle>
         
         <SectionDescription>
-          Готовы автоматизировать свои сборки? Оставьте заявку, и мы свяжемся с вами в течение 24 часов для обсуждения деталей интеграции и настройки вашего проекта.
+          Зарегистрируйтесь сейчас и получите приоритетный доступ к платформе облачных сборок iOS и macOS. Первые 100 пользователей получат  токены для сборок.
         </SectionDescription>
         
         <ContactContainer>
