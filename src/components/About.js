@@ -217,7 +217,7 @@ const About = () => {
               <div className="shadow"></div>
             </SectionSubtitle>
             
-            <SectionTitle>Мы позаботимся о сборках</SectionTitle>
+            <SectionTitle as="h2">Мы позаботимся о сборках</SectionTitle>
           </HeadingsContainer>
           
           <DesktopDescription>
@@ -235,9 +235,13 @@ const About = () => {
           {features.map(feature => (
             <FeatureCard key={feature.id}>
               <FeatureIcon>
-                <img src={feature.icon} alt={feature.title} />
+                <img 
+                  src={feature.icon} 
+                  alt={`Иконка функции: ${feature.title}`}
+                  loading="lazy"
+                />
               </FeatureIcon>
-              <FeatureTitle>{feature.title}</FeatureTitle>
+              <FeatureTitle as="h3">{feature.title}</FeatureTitle>
             </FeatureCard>
           ))}
         </FeaturesGrid>

@@ -1,0 +1,123 @@
+# Zen Pipeline - Полная документация для LLM
+
+## Обзор продукта
+
+Zen Pipeline - это облачная платформа Builds-as-a-Service для автоматизированных сборок iOS и macOS приложений. Продукт решает проблему высоких капитальных затрат на Mac-оборудование, предоставляя эластичную macOS build-инфраструктуру с автоматическим масштабированием и прозрачным биллингом по факту использования.
+
+**Целевые пользователи:**
+- Малые и средние мобильные студии без собственного Mac-парка
+- Enterprise команды с переменной нагрузкой, нуждающиеся в эластичной capacity
+- CI/CD платформы и DevOps команды, ищущие "plug-and-play" macOS runners
+
+## MVP функциональность
+
+### 1. Эластичная macOS Build Cloud
+- **Автоматическое provisioning и масштабирование** macOS build-агентов
+- **Поддержка Xcode версий**: N-1, N, N+1 (beta) - текущая версия 15.0+
+- **Полная изоляция сборок**: одноразовые VM или чистые snapshots между сборками
+- **Медианное время ожидания**: ≤2 минуты для запуска build-агента
+
+### 2. CI/CD интеграции  
+- **REST API**: Полнофункциональный публичный API для управления сборками
+- **CLI утилита**: Для локальных или нестандартных pipeline
+- **Post-MVP**: Плагины для GitHub Actions, GitLab CI, Bitrise, Jenkins
+
+### 3. Безопасность и Apple Compliance
+- **Безопасный код-подписание workflow**: Загрузка сертификатов → эфемерное использование → автоматическая очистка
+- **Автоматическая генерация**: Apple signing certificates и provisioning profiles без локального Mac
+- **Полная изоляция**: Каждая сборка выполняется в изолированной среде
+
+### 4. Artifact Storage и кеширование
+- **Быстрое получение артефактов**: .ipa, .xcarchive, dSYM, полные build logs
+- **Автоматическая загрузка**: Все артефакты сохраняются в облачном хранилище
+- **Retention период**: Настраивается по тарифному плану (30+ дней)
+- **Dependency caching**: CocoaPods, Swift Package Manager для ускорения сборок
+
+### 5. Observability и прозрачный биллинг
+- **Web dashboard**: Real-time статусы сборок, потребление минут, потоковые логи
+- **Pay-as-you-go биллинг**: Оплата по факту использования + опциональные месячные пакеты  
+- **Usage API**: Детализация потребления и автоматическое выставление счетов
+
+### 6. Unit/UI Test выполнение
+- **XCTest suites**: Запуск тестов на тех же build-агентах
+- **Базовая параллелизация**: Разделение по test targets для ускорения
+
+## Non-Functional Requirements (MVP)
+
+### Availability & Performance SLA
+- **Control Plane**: ≥99.5% месячная доступность
+- **Build Agents**: ≥99% доступность для выполнения сборок  
+- **Build Startup Latency**: ≤2 минуты медианное время ожидания
+- **Success Rate**: ≥95% успешных сборок от общего количества
+
+### Security & Compliance
+- **SOC 2 Type I**: Планируется к General Availability
+- **Encryption**: Данные зашифрованы в покое и при передаче
+- **Apple EULA Compliance**: Строгое соответствие лицензионным требованиям Apple
+- **Data Residency**: Все данные хранятся в России
+
+### Ограничения MVP
+- **Xcode версии**: ≥15.0 (более старые версии не поддерживаются)
+- **Out-of-Scope**: Physical device testing (реальные iPhone/iPad фермы)
+- **Out-of-Scope**: Auto-scaling GPU-accelerated агенты для SwiftUI previews
+- **Out-of-Scope**: Private on-premise регионы
+
+## Success Metrics (6-месячные OKR)
+
+### Целевые показатели MVP
+- **Active Customer Organizations (MAU)**: ≥50 активных клиентов
+- **Median Wait Time**: ≤2 минуты для получения свободного build-агента
+- **Build Success Rate**: ≥95% успешных сборок от общего количества
+- **Gross Build Minutes**: ≥100k минут сборок в месяц
+
+### Risks & Assumptions
+- **Apple изменит условия macOS virtualization**: Митигация через physical bare-metal fallback
+- **GPU потребности для SwiftUI previews**: Мониторинг demand, исследование GPU-enabled instances  
+- **Конкуренция**: GitHub M-series Runners, MacStadium, CI providers - дифференциация через price transparency, startup latency, caching
+
+## Глоссарий терминов
+
+### Ключевые понятия
+- **Build Agent**: Disposable macOS VM или bare-metal host, выполняющий build job
+- **Artifact**: Выходные файлы сборки (.ipa, .xcarchive, dSYM, полные логи)
+- **Retention Period**: Временное окно хранения артефактов и логов в облачном хранилище
+- **Burst Capacity**: Возможность временного масштабирования сверх зарезервированной capacity
+
+### Use Cases по типам клиентов
+- **Малые/средние мобильные студии**: Команды без собственного Mac-парка, нуждающиеся в эластичной capacity для пиковых нагрузок
+- **Enterprise команды**: Корпоративные команды с переменной нагрузкой, которым нужны "plug-and-play" macOS runners
+- **CI/CD платформы**: DevOps команды, интегрирующие macOS сборки в существующие pipeline
+
+## Статус разработки MVP
+
+### Definition of Done (MVP)
+- **Два параллельных iOS build**: Успешное завершение при запуске через dashboard/API
+- **Artifact accessibility**: Доступ к артефактам через pre-signed URLs в течение retention периода
+- **Real-time dashboard**: Отображение live логов и build duration
+- **End-to-end user flow**: Новый пользователь может зарегистрироваться, загрузить signing assets, запустить сборку
+- **VM isolation**: Snapshot revert гарантирует чистое состояние между сборками
+- **Signing без Mac**: Генерация signing credentials и подписанные сборки без локального Mac
+
+### Post-MVP Roadmap  
+- **Дополнительные Mac mini nodes**: Автоматическая регистрация для масштабирования
+- **CI/CD плагины**: GitHub Actions, GitLab CI, Jenkins интеграции
+- **Advanced dependency caching**: Улучшенный caching layer для CocoaPods/SPM
+- **On-demand pricing calculator**: Калькулятор стоимости и promo codes
+- **SOC 2 Type I compliance**: Полная сертификация к General Availability
+
+### Constraints & Limitations
+- **Минимальная версия Xcode**: ≥15.0 (более старые версии не поддерживаются)
+- **Apple EULA compliance**: Строгое соответствие лицензионным ограничениям Apple
+- **Региональные ограничения**: Первоначальный запуск только в России
+
+---
+
+Контактная информация:
+- Сайт: https://zen-pipeline.ru
+- Email: info@zen-pipeline.ru
+- Техническая поддержка: support@zen-pipeline.ru
+- Продажи: sales@zen-pipeline.ru
+- Telegram: @zenpipeline_support
+
+Последнее обновление: 2025-01-09
+Версия документации: 1.0

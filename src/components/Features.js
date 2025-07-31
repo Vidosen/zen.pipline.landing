@@ -190,7 +190,7 @@ const Features = () => {
           <div className="shadow"></div>
         </SectionSubtitle>
         
-        <SectionTitle>Почему выбирают нас?</SectionTitle>
+        <SectionTitle as="h2">Почему выбирают нас?</SectionTitle>
         
         <SectionDescription>
           Разрабатывать приложения для iOS и macOS стало проще, чем когда-либо. Наш сервис избавляет вас от рутинных задач и дорогостоящих инвестиций в оборудование, предоставляя всё необходимое для комфортной работы в облаке.
@@ -210,7 +210,11 @@ const Features = () => {
                 </SectionSubtitle>
               </FeatureIconContainer>
               <FeatureIcon>
-                <img src={feature.icon} alt={feature.title} />
+                <img 
+                  src={feature.icon} 
+                  alt={`Иконка преимущества: ${feature.title}`}
+                  loading="lazy"
+                />
               </FeatureIcon>
               <FeatureDescription>{feature.description}</FeatureDescription>
             </FeatureCard>
@@ -229,7 +233,11 @@ const Features = () => {
                 </SectionSubtitle>
               </FeatureIconContainer>
               <FeatureIcon>
-                <img src={feature.icon} alt={feature.title} />
+                <img 
+                  src={feature.icon} 
+                  alt={`Иконка преимущества: ${feature.title}`}
+                  loading="lazy"
+                />
               </FeatureIcon>
               <FeatureDescription>{feature.description}</FeatureDescription>
             </FeatureCard>

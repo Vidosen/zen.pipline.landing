@@ -106,7 +106,7 @@ const Hero = () => {
       <Container>
         <HeroContent>
           
-          <SectionTitle>Облачные сборки для iOS и macOS</SectionTitle>
+          <SectionTitle as="h1">Облачные сборки для iOS и macOS</SectionTitle>
           
           <CallToAction>
             <SectionDescription>
@@ -118,6 +118,7 @@ const Hero = () => {
                 smooth={true} 
                 duration={800} 
                 offset={-50}
+                aria-label="Оставить заявку на бесплатный пробный период Zen Pipeline"
               >
                 Оставить заявку
               </ShinyButton>

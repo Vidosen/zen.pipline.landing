@@ -1,0 +1,57 @@
+User-agent: *
+Allow: /
+
+# Основные страницы
+Allow: /index.html
+Allow: /images/
+Allow: /static/
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+# Блокируем служебные файлы
+Disallow: /build/
+Disallow: /node_modules/
+Disallow: /.env
+Disallow: /package.json
+Disallow: /package-lock.json
+
+# LLM боты (разрешаем доступ)
+User-agent: GPTBot
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+User-agent: PerplexityBot
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+User-agent: ChatGPT-User
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+User-agent: Anthropic-AI
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+User-agent: Meta-ExternalAgent
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+# Sitemap
+Sitemap: https://zen-pipeline.ru/sitemap.xml
+
+# LLMs.txt для AI моделей
+# Указываем путь к файлу для LLM
+# LLMs.txt: https://zen-pipeline.ru/llms.txt
+
+# Время обхода (в секундах)
+Crawl-delay: 1
