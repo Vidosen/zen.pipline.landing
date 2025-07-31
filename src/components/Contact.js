@@ -473,7 +473,7 @@ const Contact = () => {
                   required
                 />
                 <CheckboxLabel htmlFor="agreement">
-                  Я принимаю политику обработки персональных данных и согласен получать информацию о продукте
+                  Я принимаю <a href="/policy.html" target="_blank" rel="noopener noreferrer" style={{color: '#385EFF', textDecoration: 'underline'}}>политику обработки персональных данных</a> и согласен получать информацию о продукте
                 </CheckboxLabel>
               </CheckboxContainer>
               

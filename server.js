@@ -8,6 +8,9 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// Serve static files from public directory
+app.use(express.static('public'));
+
 // PostgreSQL connection
 const pool = new Pool({
   host: process.env.DB_HOST || 'localhost',
