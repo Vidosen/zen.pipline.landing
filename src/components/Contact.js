@@ -209,9 +209,16 @@ const ContactDecorationWrapper = styled.div`
 `;
 
 // Enhanced Input Component with floating label
-const EnhancedInput = ({ label, type, name, value, onChange, required = false }) => {
+const EnhancedInput = ({ label, type, name, value, onChange, onFocus, required = false }) => {
   const [isFocused, setIsFocused] = useState(false);
   const isFloating = isFocused || value.length > 0;
+
+  const handleFocus = () => {
+    setIsFocused(true);
+    if (onFocus) {
+      onFocus();
+    }
+  };
 
   return (
     <InputWrapper>
@@ -223,7 +230,7 @@ const EnhancedInput = ({ label, type, name, value, onChange, required = false })
         name={name}
         value={value}
         onChange={onChange}
-        onFocus={() => setIsFocused(true)}
+        onFocus={handleFocus}
         onBlur={() => setIsFocused(false)}
         hasFloatingLabel={true}
         required={required}
@@ -233,7 +240,7 @@ const EnhancedInput = ({ label, type, name, value, onChange, required = false })
 };
 
 // Enhanced Phone Input with interactive formatting
-const EnhancedPhoneInput = ({ name, value, onChange, required = false }) => {
+const EnhancedPhoneInput = ({ name, value, onChange, onFocus, required = false }) => {
 
   // Initialize with +7 if empty
   React.useEffect(() => {
@@ -331,6 +338,11 @@ const EnhancedPhoneInput = ({ name, value, onChange, required = false }) => {
         }
       });
     }
+    
+    // Trigger form start tracking
+    if (onFocus) {
+      onFocus();
+    }
   };
 
   return (
@@ -361,9 +373,25 @@ const Contact = () => {
   
   const [showModal, setShowModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formInteractionStarted, setFormInteractionStarted] = useState(false);
+  const [scrollTracked, setScrollTracked] = useState(false);
+  
+  // Функция для отслеживания начала взаимодействия с формой
+  const handleFormStart = () => {
+    if (!formInteractionStarted) {
+      setFormInteractionStarted(true);
+      if (window.trackFormStart) {
+        window.trackFormStart();
+      }
+    }
+  };
   
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
+    // Отслеживаем первое взаимодействие с формой
+    handleFormStart();
+    
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
@@ -393,6 +421,11 @@ const Contact = () => {
       });
       
       if (response.ok) {
+        // Отслеживаем успешную отправку формы
+        if (window.trackFormSubmit) {
+          window.trackFormSubmit();
+        }
+        
         setShowModal(true);
         setFormData({
           name: '',
@@ -401,6 +434,7 @@ const Contact = () => {
           company: '',
           agreement: false
         });
+        setFormInteractionStarted(false); // Сбрасываем флаг для следующего использования
       } else {
         console.error('Ошибка при отправке формы');
       }
@@ -410,6 +444,35 @@ const Contact = () => {
       setIsSubmitting(false);
     }
   };
+
+  // Отслеживание скролла к форме
+  React.useEffect(() => {
+    const contactSection = document.getElementById('contact');
+    if (!contactSection || scrollTracked) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !scrollTracked) {
+            setScrollTracked(true);
+            if (window.trackFormScroll) {
+              window.trackFormScroll();
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.3, // Срабатывает когда 30% секции видно
+        rootMargin: '0px 0px -20% 0px' // Небольшой отступ снизу
+      }
+    );
+
+    observer.observe(contactSection);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [scrollTracked]);
 
   return (
     <ContactSection id="contact">
@@ -437,6 +500,7 @@ const Contact = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
+                  onFocus={handleFormStart}
                   required
                 />
                 <EnhancedInput
@@ -445,6 +509,7 @@ const Contact = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
+                  onFocus={handleFormStart}
                   required
                 />
                 <EnhancedPhoneInput
@@ -452,6 +517,7 @@ const Contact = () => {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
+                  onFocus={handleFormStart}
                   required
                 />
                 <EnhancedInput
@@ -460,6 +526,7 @@ const Contact = () => {
                   name="company"
                   value={formData.company}
                   onChange={handleChange}
+                  onFocus={handleFormStart}
                 />
               </FormInputs>
               
@@ -470,6 +537,7 @@ const Contact = () => {
                   id="agreement"
                   checked={formData.agreement}
                   onChange={handleChange}
+                  onFocus={handleFormStart}
                   required
                 />
                 <CheckboxLabel htmlFor="agreement">

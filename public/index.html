@@ -129,6 +129,69 @@
   <noscript><div><img src="https://mc.yandex.ru/watch/103555381" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
   <!-- /Yandex.Metrika counter -->
 
+  <!-- Analytics Event Tracking Functions -->
+  <script type="text/javascript">
+    // Функции для отслеживания событий
+    window.trackFormStart = function() {
+      // Yandex Metrica - переход к форме
+      if (typeof ym !== 'undefined') {
+        ym(103555381, 'reachGoal', 'form_start');
+      }
+      
+      // MyTracker - переход к форме
+      if (typeof _tmr !== 'undefined') {
+        _tmr.push({
+          id: "3659683",
+          type: "reachGoal",
+          goal: "form_start",
+          value: 1
+        });
+      }
+      
+      console.log('Analytics: Form interaction started');
+    };
+
+    window.trackFormSubmit = function() {
+      // Yandex Metrica - отправка заявки
+      if (typeof ym !== 'undefined') {
+        ym(103555381, 'reachGoal', 'lead_submit');
+      }
+      
+      // MyTracker - отправка заявки
+      if (typeof _tmr !== 'undefined') {
+        _tmr.push({
+          id: "3659683",
+          type: "reachGoal",
+          goal: "lead_submit",
+          value: 10
+        });
+      }
+      
+      console.log('Analytics: Lead form submitted');
+    };
+
+    // Функция для отслеживания скролла к форме
+    window.trackFormScroll = function() {
+      // Yandex Metrica - скролл к форме
+      if (typeof ym !== 'undefined') {
+        ym(103555381, 'reachGoal', 'form_scroll');
+      }
+      
+      // MyTracker - скролл к форме  
+      if (typeof _tmr !== 'undefined') {
+        _tmr.push({
+          id: "3659683",
+          type: "reachGoal",
+          goal: "form_scroll",
+          value: 1
+        });
+      }
+      
+      console.log('Analytics: Scrolled to form section');
+    };
+  </script>
+  <!-- /Analytics Event Tracking Functions -->
+
   <!-- JSON-LD структурированные данные -->
   <script type="application/ld+json">
   {
