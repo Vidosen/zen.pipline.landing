@@ -105,14 +105,14 @@ const HeaderRight = styled.div`
 const ContactInfo = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
   
   @media (max-width: 768px) {
     display: none;
   }
 `;
 
-const TelegramIcon = styled.div`
+const SocialIcon = styled.a`
   width: 40px;
   height: 40px;
   display: flex;
@@ -122,6 +122,13 @@ const TelegramIcon = styled.div`
   border-radius: 65px;
   background-color: rgba(103, 78, 180, 0.2);
   backdrop-filter: blur(20px);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: rgba(103, 78, 180, 0.3);
+    transform: translateY(-2px);
+  }
   
   &::before {
     content: '';
@@ -145,11 +152,10 @@ const TelegramIcon = styled.div`
   }
 `;
 
-const ContactText = styled.span`
-  font-family: 'Gilroy', sans-serif;
-  font-weight: 400;
-  font-size: 15px;
-  color: white;
+const SocialLinks = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
 `;
 
 const MobileMenuButton = styled.button`
@@ -210,10 +216,14 @@ const Header = () => {
         
         <HeaderRight>
           <ContactInfo>
-            <TelegramIcon>
-              <img src="/images/icon-telegram.svg" alt="Telegram" />
-            </TelegramIcon>
-            <ContactText>Tg @zen_pipeline</ContactText>
+            <SocialLinks>
+              <SocialIcon href="https://t.me/+LKsXOu6g3DkwNjgy" target="_blank" rel="noopener noreferrer">
+                <img src="/images/icon-telegram.svg" alt="Telegram" />
+              </SocialIcon>
+              <SocialIcon href="https://vk.com/zen.pipeline" target="_blank" rel="noopener noreferrer">
+                <img src="/images/icon-vk.svg" alt="VK" />
+              </SocialIcon>
+            </SocialLinks>
           </ContactInfo>
           <MobileMenuButton onClick={toggleMobileMenu}>
             {mobileMenuOpen ? '✕' : '☰'}

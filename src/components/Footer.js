@@ -96,10 +96,10 @@ const Footer = () => {
         <FooterSocials>
           <FooterHeading>Мы в социальных сетях</FooterHeading>
           <SocialIcons>
-            <SocialIcon href="https://vk.com" target="_blank" rel="noopener noreferrer">
+            <SocialIcon href="https://vk.com/zen.pipeline" target="_blank" rel="noopener noreferrer">
               <img src="/images/icon-vk.svg" alt="VK" />
             </SocialIcon>
-            <SocialIcon href="https://t.me/zen_pipeline" target="_blank" rel="noopener noreferrer">
+            <SocialIcon href="https://t.me/+LKsXOu6g3DkwNjgy" target="_blank" rel="noopener noreferrer">
               <img src="/images/icon-telegram.svg" alt="Telegram" />
             </SocialIcon>
           </SocialIcons>
