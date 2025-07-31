@@ -33,21 +33,25 @@
 - **Authentication:** Password-based SSH (root user)
 - **Services:** PostgreSQL + Node.js Backend + Nginx Frontend
 - **Deployment:** Docker Compose based
-- **Configuration:** HTTP only (no SSL currently)
+- **Configuration:** HTTP + HTTPS with SSL certificates
 
 ## Quick Commands
 
 ```bash
 # Deploy landing page
-./scripts/deploy-to-server.sh
+./deploy-to-server.sh
 
 # Check server status
 sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'cd /opt/zen-landing && docker-compose ps'
+
+# Verify ports (HTTP/HTTPS) - NEW!
+sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'cd /opt/zen-landing && bash scripts/verify-ports.sh'
 
 # View logs
 sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'cd /opt/zen-landing && docker-compose logs -f'
 
 # Test endpoints
 curl http://95.163.220.11/
+curl https://95.163.220.11/
 curl http://95.163.220.11/api/health
 ``` 

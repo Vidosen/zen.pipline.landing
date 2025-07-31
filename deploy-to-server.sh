@@ -108,6 +108,7 @@ if [ -f "ssl/zen-pipeline.ru-fullchain.crt" ] && [ -f "ssl/zen-pipeline.ru.key" 
     docker-compose -f docker-compose.prod.yml build
     
     echo "🚀 Starting services..."
+    docker-compose -f docker-compose.prod.yml down
     docker-compose -f docker-compose.prod.yml up -d
     SSL_ENABLED=true
 else
@@ -123,6 +124,20 @@ fi
 # Wait for services
 echo "⏳ Waiting for services to start..."
 sleep 15
+
+# Verify port bindings
+if [ "$SSL_ENABLED" = true ]; then
+    echo "🔍 Verifying HTTP (80) and HTTPS (443) ports..."
+    if netstat -tlnp | grep -E ':80.*LISTEN' && netstat -tlnp | grep -E ':443.*LISTEN'; then
+        echo "✅ Both HTTP and HTTPS ports are properly exposed"
+    else
+        echo "❌ Port binding issue detected! Fixing..."
+        docker stop zen-landing-frontend || true
+        docker rm zen-landing-frontend || true
+        docker-compose -f docker-compose.prod.yml up -d frontend
+        sleep 5
+    fi
+fi
 
 # Check status
 echo "📊 Service status:"
