@@ -9,6 +9,8 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'Dockerfile.*'
+      - 'nginx.prod.conf'
+      - 'docs/**'
       - '.github/workflows/deploy.yml'
   pull_request:
     branches: [ master ]
