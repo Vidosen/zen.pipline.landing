@@ -52,8 +52,8 @@ jobs:
         echo "Frontend: $FRONTEND_IMAGE"
         echo "Backend: $BACKEND_IMAGE"
         
-        # Upload template file and execute production deployment
-        sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no docker-compose.prod.template.yml $DEPLOY_USER@$DEPLOY_HOST:/opt/zen-landing/
+        # Upload template file and nginx config, then execute production deployment
+        sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no docker-compose.prod.template.yml nginx.prod.conf $DEPLOY_USER@$DEPLOY_HOST:/opt/zen-landing/
         
         # Execute production deployment
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "
@@ -72,6 +72,15 @@ jobs:
           # Deploy with proper container recreation
           docker-compose -f docker-compose.prod.yml down
           docker-compose -f docker-compose.prod.yml up -d
+          
+          # Verify nginx config was updated
+          echo '📋 Verifying nginx config update...'
+          if docker exec zen-landing-frontend nginx -t; then
+            echo '✅ Nginx config is valid'
+          else
+            echo '❌ Nginx config validation failed'
+            exit 1
+          fi
           
           # Wait for services to be ready
           sleep 10
@@ -134,6 +143,7 @@ jobs:
         echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Frontend Image**: ${{ steps.images.outputs.frontend-image }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Backend Image**: ${{ steps.images.outputs.backend-image }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Nginx Config**: Updated from repository" >> $GITHUB_STEP_SUMMARY
         echo "- **Deployed by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Timestamp**: $(date -u)" >> $GITHUB_STEP_SUMMARY
         
