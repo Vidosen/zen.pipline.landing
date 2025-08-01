@@ -1,31 +1,33 @@
-# Deployment Scripts
+# Deployment
 
-## Active Scripts
+## Production Deployment
 
-### `deploy-to-server.sh` ✅
-**Status:** ACTIVE - Main deployment script for landing page  
-**Usage:** `./scripts/deploy-to-server.sh`  
-**Target:** 95.163.220.11 (current VPS server)  
+### GitHub Actions Workflows ✅
+**Status:** ACTIVE - Modern CI/CD pipeline  
+**Location:** `.github/workflows/`  
 **Features:**
-- Optimized file copying (excludes node_modules, build artifacts)
-- Uses .gitignore patterns
-- Password-based SSH authentication
-- Automatic container management
-- Health checks
+- Automated Docker image builds with `--no-cache`
+- GitHub Container Registry (GHCR) for image storage
+- Manual production deployment with approval
+- Automatic nginx.prod.conf updates
+- Health checks and validation
+- Deployment summaries
 
-**Last Updated:** July 29, 2025
+**Workflows:**
+- `deploy.yml` - Build, test, and push images on every commit
+- `manual-deploy.yml` - Manual production deployment via GitHub UI
 
-### `../landing-page/deploy.sh` ⚠️
+### Local Development Script ⚠️
 **Status:** RESERVE - Local deployment script  
-**Usage:** `cd landing-page && ./deploy.sh [dev|prod|ssl]`  
-**Target:** Local development or future domain-based deployment  
+**Usage:** `./deploy.sh [dev|prod|ssl]`  
+**Target:** Local development or testing  
 **Features:**
 - Local Docker Compose deployment
 - Development, production and SSL modes
 - Let's Encrypt integration
 - Well-structured argument parsing
 
-**Note:** Not used for current VPS deployment, but useful for local development
+**Note:** For local development only. Production uses GitHub Actions.
 
 ## Current Infrastructure
 
@@ -35,23 +37,25 @@
 - **Deployment:** Docker Compose based
 - **Configuration:** HTTP + HTTPS with SSL certificates
 
-## Quick Commands
+## Deployment Process
+
+### Production Deployment
+1. **GitHub Actions** → **Manual Production Deployment**
+2. Input confirmation: `deploy`
+3. Select image tag (default: `latest`)
+4. Click **Run workflow**
+5. Automatic deployment with health checks
+
+### Quick Server Commands
 
 ```bash
-# Deploy landing page
-./deploy-to-server.sh
-
 # Check server status
 sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'cd /opt/zen-landing && docker-compose ps'
-
-# Verify ports (HTTP/HTTPS) - NEW!
-sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'cd /opt/zen-landing && bash scripts/verify-ports.sh'
 
 # View logs
 sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'cd /opt/zen-landing && docker-compose logs -f'
 
 # Test endpoints
-curl http://95.163.220.11/
-curl https://95.163.220.11/
-curl http://95.163.220.11/api/health
+curl https://zen-pipeline.ru/
+curl https://zen-pipeline.ru/api/health
 ``` 
