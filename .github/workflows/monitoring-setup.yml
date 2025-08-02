@@ -1,0 +1,144 @@
+name: Setup Monitoring & Keep-Alive
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'setup'
+        type: choice
+        options:
+          - setup
+          - restart
+          - status
+          - remove
+      domain:
+        description: 'Domain to monitor'
+        required: false
+        default: 'zen-pipeline.ru'
+
+jobs:
+  monitoring-management:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install sshpass
+      run: sudo apt-get update && sudo apt-get install -y sshpass
+
+    - name: Add server to known hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Execute monitoring action
+      env:
+        DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        DOMAIN: ${{ github.event.inputs.domain }}
+        ACTION: ${{ github.event.inputs.action }}
+      run: |
+        echo "🔧 Executing monitoring action: $ACTION for domain: $DOMAIN"
+        
+        # Upload monitoring scripts
+        sshpass -p "$SSH_PASSWORD" scp -r -o StrictHostKeyChecking=no scripts/ docker-compose.keepalive.yml $DEPLOY_USER@$DEPLOY_HOST:/opt/zen-landing/
+        
+        # Execute the requested action
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "
+          cd /opt/zen-landing
+          chmod +x scripts/*.sh
+          
+          case '$ACTION' in
+            'setup')
+              echo '🚀 Setting up monitoring and keep-alive...'
+              
+              # Stop existing keep-alive if running
+              docker stop zen-keepalive 2>/dev/null || true
+              docker rm zen-keepalive 2>/dev/null || true
+              
+              # Start keep-alive service
+              docker-compose -f docker-compose.keepalive.yml up -d
+              
+              # Setup cron monitoring
+              ./scripts/setup-monitoring.sh '$DOMAIN'
+              
+              echo '✅ Monitoring setup completed'
+              ;;
+              
+            'restart')
+              echo '🔄 Restarting monitoring services...'
+              
+              # Restart keep-alive container
+              docker-compose -f docker-compose.keepalive.yml restart
+              
+              # Clear and restart cron monitoring
+              crontab -l 2>/dev/null | grep -v 'keep-alive.sh' | grep -v 'monitor-performance.sh' | crontab -
+              ./scripts/setup-monitoring.sh '$DOMAIN'
+              
+              echo '✅ Monitoring services restarted'
+              ;;
+              
+            'status')
+              echo '📊 Checking monitoring status...'
+              
+              # Check keep-alive container
+              if docker ps | grep -q zen-keepalive; then
+                echo '✅ Keep-alive container: RUNNING'
+              else
+                echo '❌ Keep-alive container: NOT RUNNING'
+              fi
+              
+              # Check cron jobs
+              echo '📋 Active cron jobs:'
+              crontab -l 2>/dev/null | grep -E '(keep-alive|monitor-performance)' || echo 'No monitoring cron jobs found'
+              
+              # Check recent logs
+              echo '📝 Recent keep-alive logs:'
+              tail -n 5 /tmp/keep-alive.log 2>/dev/null || echo 'No keep-alive logs found'
+              
+              echo '📈 Recent performance logs:'
+              tail -n 5 /tmp/performance-monitor.log 2>/dev/null || echo 'No performance logs found'
+              ;;
+              
+            'remove')
+              echo '🗑️  Removing monitoring services...'
+              
+              # Stop and remove keep-alive container
+              docker stop zen-keepalive 2>/dev/null || true
+              docker rm zen-keepalive 2>/dev/null || true
+              
+              # Remove cron jobs
+              crontab -l 2>/dev/null | grep -v 'keep-alive.sh' | grep -v 'monitor-performance.sh' | crontab -
+              
+              # Clean up logs
+              rm -f /tmp/keep-alive.log /tmp/performance-monitor.log
+              
+              echo '✅ Monitoring services removed'
+              ;;
+              
+            *)
+              echo '❌ Unknown action: $ACTION'
+              exit 1
+              ;;
+          esac
+        "
+
+    - name: Action summary
+      if: always()
+      run: |
+        echo "## Monitoring Action Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Action**: ${{ github.event.inputs.action }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Domain**: ${{ github.event.inputs.domain }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Executed by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Timestamp**: $(date -u)" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "✅ **Monitoring action completed successfully**" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Monitoring action failed**" >> $GITHUB_STEP_SUMMARY
+        fi

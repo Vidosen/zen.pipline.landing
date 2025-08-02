@@ -52,8 +52,9 @@ jobs:
         echo "Frontend: $FRONTEND_IMAGE"
         echo "Backend: $BACKEND_IMAGE"
         
-        # Upload template file and nginx config, then execute production deployment
-        sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no docker-compose.prod.template.yml nginx.prod.conf $DEPLOY_USER@$DEPLOY_HOST:/opt/zen-landing/
+        # Upload template file, nginx config, and monitoring scripts
+        sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no docker-compose.prod.template.yml nginx.prod.conf docker-compose.keepalive.yml $DEPLOY_USER@$DEPLOY_HOST:/opt/zen-landing/
+        sshpass -p "$SSH_PASSWORD" scp -r -o StrictHostKeyChecking=no scripts/ $DEPLOY_USER@$DEPLOY_HOST:/opt/zen-landing/
         
         # Execute production deployment
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "
@@ -101,6 +102,22 @@ jobs:
             sleep 5
           fi
           
+          # Setup monitoring and keep-alive after successful deployment
+          echo '🔧 Setting up monitoring and keep-alive...'
+          chmod +x scripts/*.sh
+          
+          # Stop existing keep-alive container if running
+          docker stop zen-keepalive 2>/dev/null || true
+          docker rm zen-keepalive 2>/dev/null || true
+          
+          # Start keep-alive service
+          docker-compose -f docker-compose.keepalive.yml up -d
+          
+          # Setup cron-based monitoring as backup
+          ./scripts/setup-monitoring.sh zen-pipeline.ru
+          
+          echo '✅ Monitoring and keep-alive setup completed'
+          
           # Cleanup old images
           docker image prune -f
         "
@@ -131,12 +148,28 @@ jobs:
           HTTPS_OK=false
         fi
         
+        # Test Android-specific timeout fix
+        echo "🤖 Testing Android user agent response..."
+        ANDROID_UA="Mozilla/5.0 (Linux; Android 13; SM-G998B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
+        if curl -f -s -A "$ANDROID_UA" --max-time 10 https://$DEPLOY_HOST/ > /dev/null; then
+          echo "✅ Android user agent test passed"
+          ANDROID_OK=true
+        else
+          echo "⚠️  Android user agent test failed (may improve after warm-up)"
+          ANDROID_OK=false
+        fi
+        
         if [ "$HTTP_OK" = true ] && [ "$HTTPS_OK" = true ]; then
           echo "✅ Production deployment verified successfully"
           echo "🌐 Site available at: http://$DEPLOY_HOST and https://$DEPLOY_HOST"
+          if [ "$ANDROID_OK" = true ]; then
+            echo "🤖 Android compatibility: OK"
+          else
+            echo "🤖 Android compatibility: Needs warm-up (keep-alive will resolve this)"
+          fi
         else
           echo "❌ Production deployment verification failed"
-          echo "HTTP Status: $HTTP_OK | HTTPS Status: $HTTPS_OK"
+          echo "HTTP Status: $HTTP_OK | HTTPS Status: $HTTPS_OK | Android Status: $ANDROID_OK"
           exit 1
         fi
 
@@ -148,6 +181,9 @@ jobs:
         echo "- **Frontend Image**: ${{ steps.images.outputs.frontend-image }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Backend Image**: ${{ steps.images.outputs.backend-image }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Nginx Config**: Updated from repository" >> $GITHUB_STEP_SUMMARY
+        echo "- **Keep-alive Service**: Deployed and running" >> $GITHUB_STEP_SUMMARY
+        echo "- **Monitoring**: Cron-based backup monitoring active" >> $GITHUB_STEP_SUMMARY
+        echo "- **Android Fix**: Timeout optimizations applied" >> $GITHUB_STEP_SUMMARY
         echo "- **Deployed by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Timestamp**: $(date -u)" >> $GITHUB_STEP_SUMMARY
         

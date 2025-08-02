@@ -1,0 +1,44 @@
+version: '3.8'
+
+# Keep-alive service to prevent container cold starts
+# Usage: docker-compose -f docker-compose.keepalive.yml up -d
+
+services:
+  keepalive:
+    image: alpine:3.18
+    container_name: zen-keepalive
+    restart: unless-stopped
+    environment:
+      - DOMAIN=${DOMAIN:-zen-pipeline.ru}
+      - INTERVAL=${KEEPALIVE_INTERVAL:-120}  # seconds between checks
+    volumes:
+      - ./scripts/keep-alive.sh:/usr/local/bin/keep-alive.sh:ro
+      - keepalive-logs:/tmp
+    command: >
+      sh -c "
+        apk add --no-cache curl &&
+        chmod +x /usr/local/bin/keep-alive.sh &&
+        echo 'Starting keep-alive service...' &&
+        while true; do
+          /usr/local/bin/keep-alive.sh
+          sleep \$$INTERVAL
+        done
+      "
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 64M
+        reservations:
+          cpus: '0.05'
+          memory: 32M
+    networks:
+      - zen-network
+
+volumes:
+  keepalive-logs:
+    driver: local
+
+networks:
+  zen-network:
+    external: true

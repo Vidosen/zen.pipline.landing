@@ -37,11 +37,20 @@ services:
       postgres:
         condition: service_healthy
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
-      interval: 30s
+      interval: 15s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 30s
     networks:
       - zen-network
 
@@ -56,11 +65,20 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
     volumes:
       - ${NGINX_CONFIG:-./nginx.prod.conf}:/etc/nginx/nginx.conf:ro
       - ./ssl:/etc/nginx/ssl:ro
       - certbot-www:/var/www/certbot:ro
       - certbot-conf:/etc/letsencrypt:ro
+      - nginx-cache:/var/cache/nginx
     networks:
       - zen-network
 
@@ -81,6 +99,8 @@ volumes:
     driver: local
   certbot-www:
   certbot-conf:
+  nginx-cache:
+    driver: local
 
 networks:
   zen-network:

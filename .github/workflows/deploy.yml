@@ -10,6 +10,8 @@ on:
       - 'package-lock.json'
       - 'Dockerfile.*'
       - 'nginx.prod.conf'
+      - 'docker-compose.keepalive.yml'
+      - 'scripts/**'
       - 'docs/**'
       - '.github/workflows/deploy.yml'
   pull_request:
