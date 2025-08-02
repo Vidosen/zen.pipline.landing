@@ -31,6 +31,8 @@ services:
       - DB_NAME=${DB_NAME:-zen_pipeline}
       - DB_USER=${DB_USER:-zen_api}
       - DB_PASSWORD=${DB_PASSWORD}
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     depends_on:
       postgres:
         condition: service_healthy

@@ -121,10 +121,14 @@ jobs:
     
     steps:
     - name: Deploy to staging
+      env:
+        ADMIN_USERNAME: ${{ secrets.STAGING_ADMIN_USERNAME }}
+        ADMIN_PASSWORD: ${{ secrets.STAGING_ADMIN_PASSWORD }}
       run: |
         echo "🚀 Deploying to staging environment"
         echo "Frontend image: ${{ needs.build.outputs.frontend-image }}"
         echo "Backend image: ${{ needs.build.outputs.backend-image }}"
+        echo "Admin credentials configured: $([[ -n "$ADMIN_USERNAME" && -n "$ADMIN_PASSWORD" ]] && echo "✅" || echo "❌")"
         # Add actual staging deployment logic here
 
  

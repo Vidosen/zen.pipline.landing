@@ -66,8 +66,12 @@ jobs:
           docker pull '$FRONTEND_IMAGE'
           docker pull '$BACKEND_IMAGE'
           
-          # Update docker-compose with new images
+          # Update docker-compose with new images and admin credentials
           sed \"s|\\\${BACKEND_IMAGE:-zen-landing-backend:latest}|$BACKEND_IMAGE|g; s|\\\${FRONTEND_IMAGE:-zen-landing-frontend:latest}|$FRONTEND_IMAGE|g\" docker-compose.prod.template.yml > docker-compose.prod.yml
+          
+          # Set admin credentials from GitHub secrets
+          export ADMIN_USERNAME='${{ secrets.ADMIN_USERNAME }}'
+          export ADMIN_PASSWORD='${{ secrets.ADMIN_PASSWORD }}'
           
           # Deploy with proper container recreation
           docker-compose -f docker-compose.prod.yml down
