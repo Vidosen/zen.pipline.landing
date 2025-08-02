@@ -416,7 +416,9 @@ const Contact = () => {
           // Добавляем UTM параметры из URL
           utm_source: new URLSearchParams(window.location.search).get('utm_source'),
           utm_medium: new URLSearchParams(window.location.search).get('utm_medium'),
-          utm_campaign: new URLSearchParams(window.location.search).get('utm_campaign')
+          utm_campaign: new URLSearchParams(window.location.search).get('utm_campaign'),
+          utm_content: new URLSearchParams(window.location.search).get('utm_content'),
+          utm_term: new URLSearchParams(window.location.search).get('utm_term')
         })
       });
       
