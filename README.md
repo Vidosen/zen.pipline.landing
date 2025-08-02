@@ -16,6 +16,7 @@
 **Workflows:**
 - `deploy.yml` - Build, test, and push images on every commit
 - `manual-deploy.yml` - Manual production deployment via GitHub UI
+- `monitoring-setup.yml` - Manage keep-alive and monitoring services
 
 ### Local Development Script ⚠️
 **Status:** RESERVE - Local deployment script  
@@ -33,9 +34,11 @@
 
 - **Server IP:** 95.163.220.11
 - **Authentication:** Password-based SSH (root user)
-- **Services:** PostgreSQL + Node.js Backend + Nginx Frontend
+- **Services:** PostgreSQL + Node.js Backend + Nginx Frontend + Keep-Alive Monitoring
 - **Deployment:** Docker Compose based
 - **Configuration:** HTTP + HTTPS with SSL certificates
+- **Monitoring:** Automated keep-alive + performance monitoring
+- **Android Fix:** ✅ Resolved timeout issues (45ms response time)
 
 ## Deployment Process
 
@@ -58,4 +61,29 @@ sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'cd /opt/zen-landing && doc
 # Test endpoints
 curl https://zen-pipeline.ru/
 curl https://zen-pipeline.ru/api/health
-``` 
+
+# Test Android compatibility (should be ~45ms)
+curl -A "Mozilla/5.0 (Linux; Android 13; SM-G998B) AppleWebKit/537.36" \
+     --max-time 10 -w "Time: %{time_total}s\nHTTP: %{http_code}\n" \
+     https://zen-pipeline.ru/
+
+# Monitor keep-alive logs
+sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'tail -f /tmp/keep-alive.log'
+
+# Monitor performance logs  
+sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'tail -f /tmp/performance-monitor.log'
+```
+
+## Monitoring & Keep-Alive
+
+### Services Status
+- ✅ **Keep-alive service** - Prevents container cold starts
+- ✅ **Performance monitoring** - Tests Android/iPhone/Desktop compatibility  
+- ✅ **Automated recovery** - Cron-based backup monitoring
+
+### Key Files
+- `docker-compose.keepalive.yml` - Keep-alive service configuration
+- `scripts/` - Monitoring and keep-alive scripts
+- `docs/LOGS_MONITORING_COMMANDS.md` - Complete monitoring guide
+- `docs/ANDROID_TIMEOUT_SOLUTION.md` - Technical solution details
+- `docs/DEPLOYMENT_STATUS.md` - Current deployment status 

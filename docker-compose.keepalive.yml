@@ -33,12 +33,12 @@ services:
           cpus: '0.05'
           memory: 32M
     networks:
-      - zen-network
+      - zen-landing_zen-network
 
 volumes:
   keepalive-logs:
     driver: local
 
 networks:
-  zen-network:
+  zen-landing_zen-network:
     external: true
