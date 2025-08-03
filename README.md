@@ -37,7 +37,7 @@
 - **Services:** PostgreSQL + Node.js Backend + Nginx Frontend + Keep-Alive Monitoring
 - **Deployment:** Docker Compose based
 - **Configuration:** HTTP + HTTPS with SSL certificates
-- **Monitoring:** Automated keep-alive + performance monitoring
+- **Monitoring:** UptimeRobot external monitoring
 - **Android Fix:** ✅ Resolved timeout issues (45ms response time)
 
 ## Deployment Process
@@ -67,23 +67,21 @@ curl -A "Mozilla/5.0 (Linux; Android 13; SM-G998B) AppleWebKit/537.36" \
      --max-time 10 -w "Time: %{time_total}s\nHTTP: %{http_code}\n" \
      https://zen-pipeline.ru/
 
-# Monitor keep-alive logs
-sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'tail -f /tmp/keep-alive.log'
-
-# Monitor performance logs  
-sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'tail -f /tmp/performance-monitor.log'
+# Check UptimeRobot monitoring
+curl -f https://zen-pipeline.ru/ && echo "Site OK"
+curl -f https://zen-pipeline.ru/api/health && echo "Health OK"
 ```
 
 ## Monitoring & Keep-Alive
 
 ### Services Status
-- ✅ **Keep-alive service** - Prevents container cold starts
-- ✅ **Performance monitoring** - Tests Android/iPhone/Desktop compatibility  
-- ✅ **Automated recovery** - Cron-based backup monitoring
+- ✅ **UptimeRobot monitoring** - External uptime monitoring every 5 minutes
+- ✅ **Nginx optimizations** - Prevents container cold starts through architecture
+- ✅ **Container resource limits** - Stable performance and quick response times
 
 ### Key Files
-- `docker-compose.keepalive.yml` - Keep-alive service configuration
-- `scripts/` - Monitoring and keep-alive scripts
+- `scripts/setup-uptimerobot.sh` - UptimeRobot configuration script
+- `scripts/archive/` - Archived local monitoring scripts (replaced by UptimeRobot)
 - `docs/LOGS_MONITORING_COMMANDS.md` - Complete monitoring guide
 - `docs/ANDROID_TIMEOUT_SOLUTION.md` - Technical solution details
 - `docs/DEPLOYMENT_STATUS.md` - Current deployment status 

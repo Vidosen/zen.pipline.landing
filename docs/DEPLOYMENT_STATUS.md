@@ -13,14 +13,14 @@
 ✅ zen-landing-frontend  - работает (nginx + оптимизации)
 ✅ zen-landing-backend   - работает (healthy)  
 ✅ zen-landing-postgres  - работает (healthy)
-✅ zen-keepalive        - работает (keep-alive сервис)
+✅ UptimeRobot          - внешний мониторинг активен
 ```
 
 ### Мониторинг системы
 ```
-✅ Cron keep-alive     - каждые 2 минуты
-✅ Performance monitor - каждые 5 минут  
-✅ Логирование        - /tmp/keep-alive.log, /tmp/performance-monitor.log
+✅ UptimeRobot        - внешний мониторинг каждые 5 минут
+✅ Nginx оптимизации  - предотвращают cold starts
+✅ Container limits   - стабильная производительность
 ```
 
 ## Результаты тестирования
@@ -52,15 +52,15 @@
 - Улучшенные health checks (15s interval)
 - Nginx cache volume
 
-### 3. Keep-alive система
-- **Docker-based:** контейнер zen-keepalive
-- **Cron-based:** резервная система каждые 2 минуты
-- Двойная защита от cold starts
+### 3. External мониторинг
+- **UptimeRobot:** профессиональный внешний мониторинг
+- **Проверки:** каждые 5 минут с разных локаций
+- **Алерты:** email/SMS при недоступности
 
-### 4. Performance мониторинг
-- Тестирование Android/iPhone/Desktop User-Agent'ов
-- Измерение времени отклика
-- Автоматические алерты при проблемах
+### 4. Архитектурные оптимизации
+- Nginx worker processes и connection handling
+- SSL session cache оптимизации
+- HTTP/2 поддержка для быстрой загрузки
 
 ## Команды для мониторинга
 
@@ -69,11 +69,12 @@
 # Статус всех контейнеров
 sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'docker ps --filter "name=zen-"'
 
-# Последние логи keep-alive  
-sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'tail -5 /tmp/keep-alive.log'
+# Проверка UptimeRobot мониторинга
+curl -f https://zen-pipeline.ru/ && echo "Site OK"
+curl -f https://zen-pipeline.ru/api/health && echo "Health OK"
 
-# Логи производительности
-sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'tail -5 /tmp/performance-monitor.log'
+# Проверка nginx логов
+sshpass -p 'YruQ8kpFPET03sd7' ssh root@95.163.220.11 'docker logs --tail 10 zen-landing-frontend'
 ```
 
 ### Тестирование Android compatibility
@@ -88,14 +89,16 @@ curl -A "Mozilla/5.0 (Linux; Android 13; SM-G998B) AppleWebKit/537.36" \
 ### Обновленные файлы:
 - ✅ `nginx.prod.conf` - оптимизации для мобильных
 - ✅ `docker-compose.prod.yml` - resource limits
-- ✅ `docker-compose.keepalive.yml` - keep-alive сервис
-- ✅ `scripts/` - мониторинг и keep-alive скрипты
-- ✅ `.github/workflows/` - автоматический деплой с мониторингом
+- ✅ `.github/workflows/` - автоматический деплой
+- ✅ `scripts/setup-uptimerobot.sh` - настройка внешнего мониторинга
 
 ### Новые файлы:
 - ✅ `docs/ANDROID_TIMEOUT_SOLUTION.md` - полная документация
-- ✅ `docs/LOGS_MONITORING_COMMANDS.md` - команды мониторинга
+- ✅ `docs/LOGS_MONITORING_COMMANDS.md` - команды мониторинга  
 - ✅ `docs/DEPLOYMENT_STATUS.md` - этот файл
+
+### Архивированные файлы:
+- 📦 `scripts/archive/` - локальные keep-alive скрипты (заменены на UptimeRobot)
 
 ## CI/CD интеграция
 
