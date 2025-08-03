@@ -16,7 +16,6 @@
 **Workflows:**
 - `deploy.yml` - Build, test, and push images on every commit
 - `manual-deploy.yml` - Manual production deployment via GitHub UI
-- `monitoring-setup.yml` - Manage keep-alive and monitoring services
 
 ### Local Development Script ⚠️
 **Status:** RESERVE - Local deployment script  

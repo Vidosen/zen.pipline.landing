@@ -52,9 +52,8 @@ jobs:
         echo "Frontend: $FRONTEND_IMAGE"
         echo "Backend: $BACKEND_IMAGE"
         
-        # Upload template file, nginx config, and monitoring scripts
-        sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no docker-compose.prod.template.yml nginx.prod.conf docker-compose.keepalive.yml $DEPLOY_USER@$DEPLOY_HOST:/opt/zen-landing/
-        sshpass -p "$SSH_PASSWORD" scp -r -o StrictHostKeyChecking=no scripts/ $DEPLOY_USER@$DEPLOY_HOST:/opt/zen-landing/
+        # Upload template file and nginx config
+        sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no docker-compose.prod.template.yml nginx.prod.conf $DEPLOY_USER@$DEPLOY_HOST:/opt/zen-landing/
         
         # Execute production deployment
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "
@@ -102,21 +101,8 @@ jobs:
             sleep 5
           fi
           
-          # Setup monitoring and keep-alive after successful deployment
-          echo '🔧 Setting up monitoring and keep-alive...'
-          chmod +x scripts/*.sh
-          
-          # Stop existing keep-alive container if running
-          docker stop zen-keepalive 2>/dev/null || true
-          docker rm zen-keepalive 2>/dev/null || true
-          
-          # Start keep-alive service
-          docker-compose -f docker-compose.keepalive.yml up -d
-          
-          # Setup cron-based monitoring as backup
-          ./scripts/setup-monitoring.sh zen-pipeline.ru
-          
-          echo '✅ Monitoring and keep-alive setup completed'
+          # Note: External monitoring is handled by UptimeRobot
+          echo '✅ Deployment completed - UptimeRobot handles external monitoring'
           
           # Cleanup old images
           docker image prune -f
@@ -181,8 +167,7 @@ jobs:
         echo "- **Frontend Image**: ${{ steps.images.outputs.frontend-image }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Backend Image**: ${{ steps.images.outputs.backend-image }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Nginx Config**: Updated from repository" >> $GITHUB_STEP_SUMMARY
-        echo "- **Keep-alive Service**: Deployed and running" >> $GITHUB_STEP_SUMMARY
-        echo "- **Monitoring**: Cron-based backup monitoring active" >> $GITHUB_STEP_SUMMARY
+        echo "- **External Monitoring**: UptimeRobot active" >> $GITHUB_STEP_SUMMARY
         echo "- **Android Fix**: Timeout optimizations applied" >> $GITHUB_STEP_SUMMARY
         echo "- **Deployed by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
         echo "- **Timestamp**: $(date -u)" >> $GITHUB_STEP_SUMMARY
