@@ -1,0 +1,28 @@
+FROM nginx:alpine
+
+# Install bash for better debugging
+RUN apk add --no-cache bash curl
+
+# Create required directories
+RUN mkdir -p /var/cache/nginx/client_temp \
+    /var/cache/nginx/proxy_temp \
+    /var/cache/nginx/fastcgi_temp \
+    /var/cache/nginx/uwsgi_temp \
+    /var/cache/nginx/scgi_temp \
+    /etc/nginx/ssl \
+    /var/log/nginx
+
+# Copy nginx configuration
+COPY nginx.verbose.conf /etc/nginx/nginx.conf
+
+# Create a volume for logs
+VOLUME /var/log/nginx
+
+# Expose ports
+EXPOSE 80 443
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/healthcheck || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]

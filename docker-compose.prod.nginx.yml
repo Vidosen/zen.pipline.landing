@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: zen-landing-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-zen_pipeline}
+      POSTGRES_USER: ${DB_USER:-zen_api}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-zen_prod_secure_password_2024}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-zen_api} -d ${DB_NAME:-zen_pipeline}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zen-network
+
+  backend:
+    image: ${BACKEND_IMAGE:-zen-landing-backend:latest}
+    container_name: zen-landing-backend
+    environment:
+      - NODE_ENV=production
+      - PORT=${PORT:-3001}
+      - DB_HOST=postgres
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME:-zen_pipeline}
+      - DB_USER=${DB_USER:-zen_api}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/api/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - zen-network
+
+  frontend:
+    image: ${FRONTEND_IMAGE:-zen-landing-frontend:latest}
+    container_name: zen-landing-frontend
+    restart: unless-stopped
+    volumes:
+      - frontend_build:/usr/share/nginx/html
+    networks:
+      - zen-network
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    container_name: zen-landing-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - frontend_build:/usr/share/nginx/html:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - certbot-www:/var/www/certbot:ro
+      - certbot-conf:/etc/letsencrypt:ro
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+    networks:
+      - zen-network
+
+  # Let's Encrypt certbot service (only used when needed)
+  certbot:
+    image: certbot/certbot
+    container_name: zen-certbot
+    profiles: ["letsencrypt"]  # Only start when explicitly requested
+    volumes:
+      - certbot-www:/var/www/certbot
+      - certbot-conf:/etc/letsencrypt
+    command: certonly --webroot --webroot-path=/var/www/certbot --email ${LETSENCRYPT_EMAIL} --agree-tos --no-eff-email -d ${DOMAIN}
+    depends_on:
+      - nginx
+
+volumes:
+  postgres_data:
+    driver: local
+  certbot-www:
+  certbot-conf:
+  nginx_logs:
+    driver: local
+  frontend_build:
+    driver: local
+
+networks:
+  zen-network:
+    driver: bridge

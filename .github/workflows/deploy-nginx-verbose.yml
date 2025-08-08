@@ -1,0 +1,213 @@
+name: Deploy with Verbose Nginx
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_deployment:
+        description: 'Type "deploy" to confirm deployment with verbose Nginx'
+        required: true
+        default: ''
+      image_tag:
+        description: 'Image tag to deploy (default: latest from master)'
+        required: false
+        default: 'latest'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME_FRONTEND: ${{ github.repository }}/landing-frontend
+  IMAGE_NAME_BACKEND: ${{ github.repository }}/landing-backend
+  IMAGE_NAME_NGINX: ${{ github.repository }}/landing-nginx
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.confirm_deployment == 'deploy'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install sshpass
+      run: sudo apt-get update && sudo apt-get install -y sshpass
+
+    - name: Add server to known hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Determine image tags
+      id: images
+      run: |
+        if [ "${{ github.event.inputs.image_tag }}" = "latest" ]; then
+          echo "frontend-image=ghcr.io/vidosen/zen.pipline.landing/landing-frontend:latest" >> $GITHUB_OUTPUT
+          echo "backend-image=ghcr.io/vidosen/zen.pipline.landing/landing-backend:latest" >> $GITHUB_OUTPUT
+          echo "nginx-image=ghcr.io/vidosen/zen.pipline.landing/landing-nginx:latest" >> $GITHUB_OUTPUT
+        else
+          echo "frontend-image=ghcr.io/vidosen/zen.pipline.landing/landing-frontend:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
+          echo "backend-image=ghcr.io/vidosen/zen.pipline.landing/landing-backend:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
+          echo "nginx-image=ghcr.io/vidosen/zen.pipline.landing/landing-nginx:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push Nginx Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: Dockerfile.nginx
+        push: true
+        no-cache: true
+        tags: ${{ steps.images.outputs.nginx-image }}
+        labels: |
+          org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          org.opencontainers.image.revision=${{ github.sha }}
+
+    - name: Deploy to production server
+      env:
+        DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        FRONTEND_IMAGE: ${{ steps.images.outputs.frontend-image }}
+        BACKEND_IMAGE: ${{ steps.images.outputs.backend-image }}
+        NGINX_IMAGE: ${{ steps.images.outputs.nginx-image }}
+      run: |
+        echo "🚀 Deploying with verbose Nginx..."
+        echo "Frontend: $FRONTEND_IMAGE"
+        echo "Backend: $BACKEND_IMAGE"
+        echo "Nginx: $NGINX_IMAGE"
+        
+        # Upload required files
+        sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no \
+          docker-compose.prod.nginx.yml \
+          nginx.verbose.conf \
+          Dockerfile.nginx \
+          scripts/enable-verbose-nginx.sh \
+          scripts/disable-verbose-nginx.sh \
+          $DEPLOY_USER@$DEPLOY_HOST:/opt/zen-landing/
+        
+        # Make scripts executable
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "
+          cd /opt/zen-landing
+          chmod +x scripts/enable-verbose-nginx.sh scripts/disable-verbose-nginx.sh
+        "
+        
+        # Execute deployment with verbose Nginx
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "
+          cd /opt/zen-landing
+          
+          # Login to GitHub Container Registry
+          echo '${{ secrets.GITHUB_TOKEN }}' | docker login ghcr.io -u '${{ github.actor }}' --password-stdin
+          
+          # Pull new images
+          docker pull '$FRONTEND_IMAGE'
+          docker pull '$BACKEND_IMAGE'
+          docker pull '$NGINX_IMAGE'
+          
+          # Prepare docker-compose override to force nginx image (avoid brittle sed edits)
+          cat > docker-compose.prod.override.yml <<EOF
+          services:
+            nginx:
+              image: "$NGINX_IMAGE"
+              build: null
+          EOF
+
+          # Export images so compose env substitution works for backend/frontend
+          export FRONTEND_IMAGE='$FRONTEND_IMAGE'
+          export BACKEND_IMAGE='$BACKEND_IMAGE'
+          
+          # Set admin credentials from GitHub secrets
+          export ADMIN_USERNAME='${{ secrets.ADMIN_USERNAME }}'
+          export ADMIN_PASSWORD='${{ secrets.ADMIN_PASSWORD }}'
+          
+          # Deploy with proper container recreation
+          docker-compose -f docker-compose.prod.nginx.yml -f docker-compose.prod.override.yml down
+          docker-compose -f docker-compose.prod.nginx.yml -f docker-compose.prod.override.yml up -d
+          
+          # Verify nginx config was updated
+          echo '📋 Verifying nginx config...'
+          if docker exec zen-landing-nginx nginx -t; then
+            echo '✅ Nginx config is valid'
+          else
+            echo '❌ Nginx config validation failed'
+            exit 1
+          fi
+          
+          # Wait for services to be ready
+          sleep 10
+          
+          # Verify both HTTP and HTTPS ports are working
+          echo '🔍 Verifying HTTP (80) and HTTPS (443) ports...'
+          if netstat -tlnp | grep -E ':80.*LISTEN' && netstat -tlnp | grep -E ':443.*LISTEN'; then
+            echo '✅ Both HTTP and HTTPS ports are properly exposed'
+          else
+            echo '❌ Port binding issue detected! Retrying with manual container restart...'
+            docker stop zen-landing-nginx || true
+            docker rm zen-landing-nginx || true
+            docker-compose -f docker-compose.prod.nginx.yml -f docker-compose.prod.override.yml up -d nginx
+            sleep 5
+          fi
+          
+          echo '✅ Deployment with verbose Nginx completed'
+          
+          # Cleanup old images
+          docker image prune -f
+        "
+
+    - name: Verify deployment
+      env:
+        DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      run: |
+        echo "⏳ Waiting for services to be ready..."
+        sleep 30
+        
+        # Check if site is accessible via both HTTP and HTTPS
+        echo "🔍 Testing HTTP access..."
+        if curl -f -s http://$DEPLOY_HOST/ > /dev/null; then
+          echo "✅ HTTP (port 80) is working"
+          HTTP_OK=true
+        else
+          echo "❌ HTTP (port 80) failed"
+          HTTP_OK=false
+        fi
+        
+        echo "🔍 Testing HTTPS access..."
+        if curl -f -s -k https://$DEPLOY_HOST/ > /dev/null; then
+          echo "✅ HTTPS (port 443) is working"
+          HTTPS_OK=true
+        else
+          echo "❌ HTTPS (port 443) failed"
+          HTTPS_OK=false
+        fi
+        
+        if [ "$HTTP_OK" = true ] && [ "$HTTPS_OK" = true ]; then
+          echo "✅ Deployment with verbose Nginx verified successfully"
+          echo "🌐 Site available at: http://$DEPLOY_HOST and https://$DEPLOY_HOST"
+        else
+          echo "❌ Deployment verification failed"
+          echo "HTTP Status: $HTTP_OK | HTTPS Status: $HTTPS_OK"
+          exit 1
+        fi
+
+    - name: Deployment summary
+      if: always()
+      run: |
+        echo "## Verbose Nginx Deployment Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Frontend Image**: ${{ steps.images.outputs.frontend-image }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Backend Image**: ${{ steps.images.outputs.backend-image }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Nginx Image**: ${{ steps.images.outputs.nginx-image }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Nginx Config**: Verbose logging enabled" >> $GITHUB_STEP_SUMMARY
+        echo "- **Deployed by**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Timestamp**: $(date -u)" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "✅ **Verbose Nginx deployment completed successfully**" >> $GITHUB_STEP_SUMMARY
+          echo "To view logs: `docker-compose -f docker-compose.prod.yml logs -f nginx`" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Verbose Nginx deployment failed**" >> $GITHUB_STEP_SUMMARY
+        fi
