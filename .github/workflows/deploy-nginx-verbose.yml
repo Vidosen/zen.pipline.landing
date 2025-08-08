@@ -81,13 +81,18 @@ jobs:
         echo "Backend: $BACKEND_IMAGE"
         echo "Nginx: $NGINX_IMAGE"
         
-        # Upload required files
-        sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no \
+        # Ensure remote deployment directory exists and is writable (non-interactive)
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST '
+          mkdir -p /opt/zen-landing 2>/dev/null || sudo -n mkdir -p /opt/zen-landing 2>/dev/null || true
+          sudo -n chown -R $(id -un):$(id -gn) /opt/zen-landing 2>/dev/null || true
+        '
+
+        # Upload required files (including scripts directory)
+        sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no -r \
           docker-compose.prod.nginx.yml \
           nginx.verbose.conf \
           Dockerfile.nginx \
-          scripts/enable-verbose-nginx.sh \
-          scripts/disable-verbose-nginx.sh \
+          scripts \
           $DEPLOY_USER@$DEPLOY_HOST:/opt/zen-landing/
         
         # Make scripts executable
