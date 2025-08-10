@@ -242,6 +242,7 @@ app.get('/admin', basicAuth, async (req, res) => {
                     <th>UTM Source</th>
                     <th>Статус</th>
                     <th>IP</th>
+                    <th>Действия</th>
                 </tr>
             </thead>
             <tbody>
@@ -256,6 +257,9 @@ app.get('/admin', basicAuth, async (req, res) => {
                         <td>${lead.utm_source || '-'}</td>
                         <td><span class="status-${lead.status}">${lead.status}</span></td>
                         <td>${lead.ip_address || '-'}</td>
+                        <td>
+                          <button class="btn-delete" data-id="${lead.id}" style="color:#dc3545;cursor:pointer;background:none;border:1px solid #dc3545;padding:4px 8px;border-radius:4px">Удалить</button>
+                        </td>
                     </tr>
                 `).join('')}
             </tbody>
@@ -264,6 +268,33 @@ app.get('/admin', basicAuth, async (req, res) => {
         <p style="margin-top: 30px; color: #666;">
             Для выхода закройте браузер или очистите кэш
         </p>
+
+        <script>
+          document.addEventListener('DOMContentLoaded', function () {
+            function handleDeleteClick(event) {
+              const button = event.target.closest('.btn-delete');
+              if (!button) return;
+              const id = button.getAttribute('data-id');
+              if (!id) return;
+              if (!confirm('Удалить лид #' + id + ' безвозвратно?')) return;
+              fetch('/admin/api/leads/' + id, { method: 'DELETE' })
+                .then(async (res) => {
+                  if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    const msg = data && data.error ? data.error : 'Ошибка удаления';
+                    throw new Error(msg);
+                  }
+                  // remove row
+                  const row = button.closest('tr');
+                  if (row && row.parentNode) row.parentNode.removeChild(row);
+                })
+                .catch((err) => {
+                  alert('Не удалось удалить: ' + err.message);
+                });
+            }
+            document.body.addEventListener('click', handleDeleteClick);
+          });
+        </script>
     </body>
     </html>
     `;
@@ -305,6 +336,21 @@ app.put('/admin/api/leads/:id/status', basicAuth, async (req, res) => {
     
   } catch (error) {
     console.error('Error updating lead status:', error);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// Удаление лида
+app.delete('/admin/api/leads/:id', basicAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query('DELETE FROM leads WHERE id = $1 RETURNING id', [id]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Lead not found' });
+    }
+    res.json({ success: true, id: result.rows[0].id });
+  } catch (error) {
+    console.error('Error deleting lead:', error);
     res.status(500).json({ error: 'Database error' });
   }
 });
