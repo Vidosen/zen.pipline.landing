@@ -77,7 +77,8 @@ jobs:
           
           # Deploy with proper container recreation
           docker-compose -f docker-compose.prod.yml down
-          docker-compose -f docker-compose.prod.yml up -d
+          docker-compose -f docker-compose.prod.yml pull backend frontend || true
+          docker-compose -f docker-compose.prod.yml up -d --force-recreate backend frontend
           
           # Verify nginx config was updated
           echo '📋 Verifying nginx config update...'

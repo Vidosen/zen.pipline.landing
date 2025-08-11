@@ -115,13 +115,13 @@ jobs:
           docker pull '$BACKEND_IMAGE'
           docker pull '$NGINX_IMAGE'
           
-          # Prepare docker-compose override to force nginx image (avoid brittle sed edits)
-          cat > docker-compose.prod.override.yml <<EOF
-          services:
-            nginx:
-              image: "$NGINX_IMAGE"
-              build: null
-          EOF
+          # Prepare docker-compose override to force nginx image (use printf to avoid heredoc indentation issues)
+          printf '%s\n' \
+            'services:' \
+            '  nginx:' \
+            "    image: \"$NGINX_IMAGE\"" \
+            '    build: null' \
+            > docker-compose.prod.override.yml
 
           # Export images so compose env substitution works for backend/frontend
           export FRONTEND_IMAGE='$FRONTEND_IMAGE'
@@ -131,9 +131,10 @@ jobs:
           export ADMIN_USERNAME='${{ secrets.ADMIN_USERNAME }}'
           export ADMIN_PASSWORD='${{ secrets.ADMIN_PASSWORD }}'
           
-          # Deploy with proper container recreation
+          # Deploy with proper container recreation (force recreate backend/frontend/nginx)
           docker-compose -f docker-compose.prod.nginx.yml -f docker-compose.prod.override.yml down
-          docker-compose -f docker-compose.prod.nginx.yml -f docker-compose.prod.override.yml up -d
+          docker-compose -f docker-compose.prod.nginx.yml -f docker-compose.prod.override.yml pull backend frontend || true
+          docker-compose -f docker-compose.prod.nginx.yml -f docker-compose.prod.override.yml up -d --force-recreate backend frontend nginx
           
           # Verify nginx config was updated
           echo '📋 Verifying nginx config...'
