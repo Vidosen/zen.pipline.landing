@@ -38,14 +38,15 @@ jobs:
     - name: Determine image tags
       id: images
       run: |
+        REPO_PATH="ghcr.io/${{ github.repository }}"
         if [ "${{ github.event.inputs.image_tag }}" = "latest" ]; then
-          echo "frontend-image=ghcr.io/vidosen/zen.pipline.landing/landing-frontend:latest" >> $GITHUB_OUTPUT
-          echo "backend-image=ghcr.io/vidosen/zen.pipline.landing/landing-backend:latest" >> $GITHUB_OUTPUT
-          echo "nginx-image=ghcr.io/vidosen/zen.pipline.landing/landing-nginx:latest" >> $GITHUB_OUTPUT
+          echo "frontend-image=$REPO_PATH/landing-frontend:latest" >> $GITHUB_OUTPUT
+          echo "backend-image=$REPO_PATH/landing-backend:latest" >> $GITHUB_OUTPUT
+          echo "nginx-image=$REPO_PATH/landing-nginx:latest" >> $GITHUB_OUTPUT
         else
-          echo "frontend-image=ghcr.io/vidosen/zen.pipline.landing/landing-frontend:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
-          echo "backend-image=ghcr.io/vidosen/zen.pipline.landing/landing-backend:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
-          echo "nginx-image=ghcr.io/vidosen/zen.pipline.landing/landing-nginx:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
+          echo "frontend-image=$REPO_PATH/landing-frontend:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
+          echo "backend-image=$REPO_PATH/landing-backend:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
+          echo "nginx-image=$REPO_PATH/landing-nginx:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
         fi
 
     - name: Log in to Container Registry
