@@ -39,14 +39,15 @@ jobs:
       id: images
       run: |
         REPO_PATH="ghcr.io/${{ github.repository }}"
+        REPO_PATH_LC=$(echo "$REPO_PATH" | tr '[:upper:]' '[:lower:]')
         if [ "${{ github.event.inputs.image_tag }}" = "latest" ]; then
-          echo "frontend-image=$REPO_PATH/landing-frontend:latest" >> $GITHUB_OUTPUT
-          echo "backend-image=$REPO_PATH/landing-backend:latest" >> $GITHUB_OUTPUT
-          echo "nginx-image=$REPO_PATH/landing-nginx:latest" >> $GITHUB_OUTPUT
+          echo "frontend-image=$REPO_PATH_LC/landing-frontend:latest" >> $GITHUB_OUTPUT
+          echo "backend-image=$REPO_PATH_LC/landing-backend:latest" >> $GITHUB_OUTPUT
+          echo "nginx-image=$REPO_PATH_LC/landing-nginx:latest" >> $GITHUB_OUTPUT
         else
-          echo "frontend-image=$REPO_PATH/landing-frontend:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
-          echo "backend-image=$REPO_PATH/landing-backend:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
-          echo "nginx-image=$REPO_PATH/landing-nginx:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
+          echo "frontend-image=$REPO_PATH_LC/landing-frontend:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
+          echo "backend-image=$REPO_PATH_LC/landing-backend:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
+          echo "nginx-image=$REPO_PATH_LC/landing-nginx:${{ github.event.inputs.image_tag }}" >> $GITHUB_OUTPUT
         fi
 
     - name: Log in to Container Registry
